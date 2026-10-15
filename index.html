@@ -1,0 +1,623 @@
+<!doctype html>
+<!-- data-lang 是构建时写死的「这一页是什么语言」，绝不从网址推导；
+     data-autolang 只出现在两个首页上 —— 四本手册页没有这个属性，
+     所以中文客户把 /en/windows.html 分享给别人时，对方不会被弹走。 -->
+<html lang="zh-CN" data-lang="zh" data-autolang>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 这段要在页面画出来之前跑完，所以放在这里、不能挪到文件末尾，
+       而且必须排在 <title> 前面 —— 否则标签页标题会先闪一下中文再换掉：
+         0) 认出客户该看中文还是英文，该换语言就在首次绘制之前整页换掉
+         1) 套用上次选择的深浅色，避免刷新时闪白（和完整手册站共用同一个键，
+            两个站之间来回跳不会变来变去）
+         2) 认出客户在用哪个系统，写到 <html data-os> 上。晚一步的话，三个
+            系统的步骤会先一起闪出来再收起来
+         3) 标记「有脚本」，让需要 JS 的控件（系统切换胶囊）显示出来 -->
+  <script>
+    (function () {
+      var root = document.documentElement;
+
+      /* ---------- 0. 该看中文还是英文 ---------- */
+      var KEY_LANG = 'agentcore-lang';            // 客户点语言胶囊的选择，只在这里写
+      var KEY_BOUNCED = 'agentcore-lang-bounced'; // 本标签页已经自动换过一次语言了
+
+      function load(area, key) {
+        try { return area.getItem(key); } catch (error) { return null; }   // 隐私模式 / file:// 会抛
+      }
+      function save(area, key, value) {
+        try { area.setItem(key, value); return true; } catch (error) { return false; }
+      }
+
+      /* 中国时区白名单。不用 startsWith('Asia/')——那会把东京、首尔、
+         新加坡一起吸进来。港澳台也算中文：这里判的是客户读得懂哪种文字。 */
+      var CN_TIMEZONES = {
+        'Asia/Shanghai': 1, 'Asia/Chongqing': 1, 'Asia/Harbin': 1, 'PRC': 1,
+        'Asia/Urumqi': 1, 'Asia/Kashgar': 1,
+        'Asia/Hong_Kong': 1, 'Hongkong': 1, 'Asia/Macau': 1, 'Asia/Macao': 1,
+        'Asia/Taipei': 1, 'ROC': 1
+      };
+
+      function timezone() {
+        try {
+          var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          return typeof tz === 'string' ? tz : '';
+        } catch (error) { return ''; }
+      }
+      function inChina() { return CN_TIMEZONES[timezone()] === 1; }
+
+      /* 返回 'zh' / 'en' / ''（空串 = 认不出来）。认不出来就不猜、不换语言 ——
+         和首页认不出客户用什么系统时三个系统全列出来是同一个原则。 */
+      function detectLang() {
+        var langs = navigator.languages && navigator.languages.length
+          ? Array.prototype.slice.call(navigator.languages)
+          : [navigator.language || navigator.userLanguage || ''];
+        langs = langs.filter(Boolean).map(function (item) { return String(item).toLowerCase(); });
+
+        var i;
+        // 语言列表里主动列了中文。站点主语言就是中文，这是最强的单一信号
+        for (i = 0; i < langs.length; i++) {
+          if (langs[i] === 'zh' || langs[i].indexOf('zh-') === 0) return 'zh';
+        }
+        // ug-CN、bo-CN 这类语言的地区标在中国，同样按中文算
+        for (i = 0; i < langs.length; i++) {
+          if (/-(cn|hk|mo|tw)$/.test(langs[i])) return 'zh';
+        }
+
+        var hasEnglish = false;
+        for (i = 0; i < langs.length; i++) {
+          if (langs[i] === 'en' || langs[i].indexOf('en-') === 0) hasEnglish = true;
+        }
+        /* 只有英文、人在中国 —— 多半是系统装成英文的国内客户，给中文。
+           代价是在华外国人也会先看到中文，他们点一下「EN」就好。两边都是
+           一次点击，但「把误判留给读得懂两门语言的人」代价更小。 */
+        if (hasEnglish) return inChina() ? 'zh' : 'en';
+
+        // 明确是别的语言（日、韩、德…）—— 给英文，不看时区
+        if (langs.length) return 'en';
+
+        // 语言完全拿不到，只剩时区一个信号
+        var tz = timezone();
+        if (!tz) return '';
+        return inChina() ? 'zh' : 'en';
+      }
+
+      /* 从后退 / 前进回到这一页时不要再把人弹走，否则客户按后退会觉得「点了没用」 */
+      function cameFromHistory() {
+        try {
+          var entries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+          if (entries && entries.length) return entries[0].type === 'back_forward';
+          return !!(performance.navigation && performance.navigation.type === 2);
+        } catch (error) { return false; }
+      }
+
+      /* 该不该换语言，返回目标网址或空串。绝大多数请求在第一道判断就结束了。 */
+      function shouldBounce() {
+        var page = root.dataset.lang;
+        if (page !== 'zh' && page !== 'en') return '';
+        if (!root.hasAttribute('data-autolang')) return '';   // 手册页不掺和
+
+        var saved = load(localStorage, KEY_LANG);
+        var target = (saved === 'zh' || saved === 'en') ? saved : detectLang();
+        if (target !== 'zh' && target !== 'en') return '';
+        if (target === page) return '';
+
+        if (load(sessionStorage, KEY_BOUNCED) === '1') return '';   // 一个标签页只跳一次
+        if (cameFromHistory()) return '';
+
+        /* 英文首页只在客户明确选过中文时才回头。这一条让两个首页的判定不可能
+           互相矛盾，「你把我弹过去、我把你弹回来」从结构上就不会发生。 */
+        if (page === 'en' && saved !== 'zh') return '';
+        if (/bot|crawler|spider|slurp/i.test(navigator.userAgent || '')) return '';
+
+        /* 标记写不进去（Safari 无痕等）就干脆不跳：宁可让海外客户自己点一下
+           EN，也不冒来回弹的风险。自动跳转**绝不**写 localStorage —— 一次
+           误判会被永久记住；只有客户点语言胶囊才写。 */
+        if (!save(sessionStorage, KEY_BOUNCED, '1')) return '';
+        return page === 'zh' ? 'en/index.html' : '../index.html';
+      }
+
+      try {
+        var target = shouldBounce();
+        if (target) {
+          /* 带上 search 和 hash：首页的 id 两种语言是同一套，/#steps 跳过去仍然定位得上。
+             目标一律写显式文件名，不用 en/ —— file:// 下 en/ 会落成目录列表。 */
+          location.replace(target + location.search + location.hash);
+          return;   // 已经跳走了，剩下的初始化都不用做
+        }
+      } catch (error) {}
+
+      /* ---------- 1. 深浅色 ---------- */
+      try {
+        var theme = localStorage.getItem('agentcore-manual-theme');
+        if (theme === 'dark' || theme === 'light') root.dataset.theme = theme;
+      } catch (error) {}
+
+      try {
+        var saved = localStorage.getItem('agentcore-quick-os');
+        if (saved === 'windows' || saved === 'macos' || saved === 'linux') {
+          // 客户自己选过，以他的选择为准
+          root.dataset.os = saved;
+        } else {
+          var os = '';
+          var ua = navigator.userAgent || '';
+          var touch = (navigator.maxTouchPoints || 0) > 1;
+
+          if (navigator.userAgentData && navigator.userAgentData.platform) {
+            var platform = String(navigator.userAgentData.platform).toLowerCase();
+            if (platform.indexOf('windows') > -1) os = 'windows';
+            else if (platform.indexOf('mac') > -1) os = 'macos';
+            else if (platform.indexOf('linux') > -1) os = 'linux';
+          } else if (/iPhone|iPad|iPod|Android/i.test(ua)) {
+            // 手机：客户多半是一边看手机一边装电脑，认不出是正常的
+            os = '';
+          } else if (/Macintosh/.test(ua) && touch) {
+            // iPadOS 的 UA 长得和 Mac 一模一样，有触摸点的就不是 Mac
+            os = '';
+          } else if (/Windows/i.test(ua)) {
+            os = 'windows';
+          } else if (/Mac OS X|Macintosh/i.test(ua)) {
+            os = 'macos';
+          } else if (/Linux|X11|CrOS/i.test(ua)) {
+            os = 'linux';
+          }
+
+          /* 认不出来就什么都不写 —— quick.css 里没有 data-os 时三个系统
+             的步骤会全部列出来，客户自己点胶囊选，不会看到错的那一套。 */
+          if (os) root.dataset.os = os;
+        }
+      } catch (error) {}
+
+      root.dataset.js = 'on';
+    })();
+  </script>
+  <title>AgentCore-Light 快速上手 · 3 分钟用起来</title>
+  <meta name="description" content="AgentCore-Light AI工作状态灯快速上手指南：开机、装客户端、连上电脑、测灯效，四步做完就能用。">
+  <meta name="theme-color" content="#f3f6f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1517" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/index.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/index.html">
+  <link rel="alternate" hreflang="en" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/index.html">
+  <link rel="alternate" hreflang="x-default" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/index.html">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="quick.css">
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到正文</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>AgentCore-Light<small>快速上手</small></span>
+      </a>
+      <div class="header-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <nav class="header-nav" aria-label="页面导航">
+        <a class="tab" href="api.html">API调用手册</a>
+        <a class="tab tab-shop" href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener" title="官方店铺 · 售后与配件">官方店铺</a>
+        <a class="tab tab-lang" href="en/index.html" hreflang="en" lang="en" title="Switch to English" data-lang="en">EN</a>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切换深浅色">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap home" id="content">
+
+    <section class="hero">
+      <p class="hero-label">开箱设置指南</p>
+      <h1>3 分钟用起来</h1>
+      <p class="hero-sub">按下面四步完成设置，设备就会跟着你的 AI 工具亮起来。遇到问题，请查看最后的「卡住了？」。</p>
+    </section>
+
+    <!-- ================= 开箱提醒 =================
+         刻意放在下载和四步之前：这两条对应的正是最容易产生退款纠纷的两种情况——
+         还没测就贴了磁铁片、看到出厂测试留下的灰尘以为是二手。
+         客户得在动手之前就看到，挪到页面后面就失去意义了。 -->
+    <section class="notice" data-reveal>
+      <p class="notice-title">开始之前，请先看这两条</p>
+      <div class="notice-grid">
+        <div class="notice-item">
+          <h2>包装里的磁铁片，先别贴</h2>
+          <p>请先把下面四步做完、确认灯光和蜂鸣器都正常，再决定贴在哪里。<strong>磁铁片撕开背胶粘贴之后，不支持无理由退货。</strong>如果发现设备异常，请勿粘贴，先联系我们处理。</p>
+        </div>
+        <div class="notice-item">
+          <h2>外壳上有灰尘或指纹，是正常的</h2>
+          <p>每台设备出厂前都做过完整功能测试，组装和测试过程中会接触工作台。<strong>用包装内附带的酒精棉片擦拭一遍即可擦净</strong>，功能没有问题，请放心使用。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 下载 =================
+         安装包就在同目录的 https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/ 下，由 package_downloads.py 从 dist/ 打出来。
+
+         ⚠️ 版本号是手写的（四本手册是脚本从源码读的）。发新版时在下面三处
+            download-version 里改。 -->
+<section class="detect" id="download" data-reveal>
+      <div class="detect-main">
+        <p class="detect-kicker" id="detectKicker">请确认你的电脑系统</p>
+        <h2 class="detect-title">下载并安装客户端</h2>
+        <p class="detect-note os-only" data-for="windows">解压后双击 <code>AgentCore-Light.exe</code> 即可运行。无需安装驱动，也无需联网。</p>
+        <p class="detect-note os-only" data-for="macos">解压后把 <code>AgentCore-Light.app</code> 拖进「应用程序」文件夹。</p>
+        <p class="detect-note os-only" data-for="linux">解压后在终端中赋予执行权限并运行。无需 Python 环境。</p>
+
+        <div class="os-switch" data-js-only>
+          <p class="os-switch-label">显示的不是你的系统？手动选择：</p>
+          <button class="os-pill" type="button" data-os="windows" aria-pressed="false">Windows</button>
+          <button class="os-pill" type="button" data-os="macos" aria-pressed="false">macOS</button>
+          <button class="os-pill" type="button" data-os="linux" aria-pressed="false">Linux</button>
+        </div>
+      </div>
+      <div class="detect-actions">
+        <div class="download-item os-only" data-for="windows">
+          <a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light.zip" download>下载 Windows 版 <span>↓</span></a>
+          <p class="download-version">当前版本 v2.1.2 · Windows 10 / 11</p>
+        </div>
+        <div class="download-item os-only" data-for="macos">
+          <a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light-mac.zip" download>下载 macOS 版 <span>↓</span></a>
+          <p class="download-version">当前版本 v2.1.2 · Intel 与 Apple 芯片通用</p>
+        </div>
+        <div class="download-item os-only" data-for="linux">
+          <a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light-linux.tar.gz" download>下载 Linux 版 <span>↓</span></a>
+          <p class="download-version">当前版本 v2.1.2 · x86_64</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 四步 ================= -->
+    <h2 class="section-title" id="steps">四步完成设置</h2>
+    <p class="section-sub">第 1、4 步所有系统都一样，第 2、3 步按你使用的系统显示。</p>
+
+    <ol class="steps">
+      <li class="step" data-reveal>
+        <div class="step-num" aria-hidden="true">1</div>
+        <div class="step-body">
+          <h3>长按按键，开机 <span class="step-tag">所有系统一样</span></h3>
+          <p>按住设备上的按键约 <strong>3 秒</strong>后松开。三色灯会短暂亮起，随后停在<strong>红灯闪烁</strong>——表示设备已开机，正在等待连接。</p>
+          <p>插入 USB 线不会自动开机，仍需长按按键。关机同样长按 3 秒。</p>
+        </div>
+      </li>
+
+      <li class="step" data-reveal>
+        <div class="step-num" aria-hidden="true">2</div>
+        <div class="step-body">
+          <h3>装上客户端 <span class="step-tag">按你的系统</span></h3>
+
+          <div class="os-only" data-for="windows">
+            <ol>
+              <li>在上方下载 <code>AgentCore-Light.zip</code>，解压得到 <code>AgentCore-Light.exe</code>。</li>
+              <li>双击 <code>AgentCore-Light.exe</code> 运行。客户端会打开一个浏览器页面，即控制台。</li>
+            </ol>
+            <div class="callout callout-important">
+              <p><strong>Windows 弹「已保护你的电脑」怎么办？</strong></p>
+              <p>点「更多信息」→「仍要运行」。软件未购买付费的代码签名证书，新版本下载量较少，被 SmartScreen 拦截属于正常现象，<strong>并非病毒</strong>。若杀毒软件报警或隔离了文件，请将其加入信任区。</p>
+            </div>
+          </div>
+
+          <div class="os-only" data-for="macos">
+            <ol>
+              <li>在上方下载 <code>AgentCore-Light-mac.zip</code>，解压得到 <code>AgentCore-Light.app</code>。</li>
+              <li>把 <code>AgentCore-Light.app</code> <strong>拖进「应用程序」文件夹</strong>。请勿跳过此步——若直接在解压目录中运行，后续的开机自启、AI 工具连接和在线更新都会异常。</li>
+              <li>在「应用程序」中找到它，<strong>按住 Control 点按</strong>（或右键）图标，选「打开」，再确认一次。</li>
+            </ol>
+            <div class="callout callout-important">
+              <p><strong>Mac 说「无法验证开发者」怎么办？</strong></p>
+              <p>打开「系统设置 → 隐私与安全性」，找到刚才被拦截的提示，点「<strong>仍要打开</strong>」。macOS 15 及之后 Control 点按不再有效，只能使用此方法。</p>
+              <p>如果提示「<strong>已损坏，无法打开</strong>」，打开「终端」执行下面这行，再重新打开：</p>
+              <p class="step-command">xattr -dr com.apple.quarantine /Applications/AgentCore-Light.app</p>
+              <p>如果是<strong>双击完全没反应</strong>，通常是未拖入「应用程序」文件夹，请回到上文第 2 步。</p>
+            </div>
+          </div>
+
+          <div class="os-only" data-for="linux">
+            <ol>
+              <li>在上方下载 <code>AgentCore-Light-linux.tar.gz</code>，解压。</li>
+              <li>打开终端，进入解压后的目录。</li>
+              <li>首次运行需先赋予执行权限，然后启动：</li>
+            </ol>
+            <p class="step-command">chmod +x AgentCore-Light
+./AgentCore-Light</p>
+            <div class="callout callout-warning">
+              <p><strong>不要用 <code>sudo ./AgentCore-Light</code> 启动。</strong></p>
+              <p>软件全程以普通用户身份运行，不需要也不应该提权。只有下面第 3 步给串口权限的那一条命令需要 sudo。</p>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <li class="step" data-reveal>
+        <div class="step-num" aria-hidden="true">3</div>
+        <div class="step-body">
+          <h3>连上电脑 <span class="step-tag">按你的系统</span></h3>
+          <p>设备开机后会自动进入<strong>蓝牙模式</strong>，此时状态灯<strong>红灯闪烁</strong>，表示它正在等待电脑连接。连上之后红灯就会变成<strong>绿灯呼吸</strong>（灯光缓慢地一亮一暗）。</p>
+          <p>下面两种连接方式<strong>任选一种</strong>：蓝牙无需插线，适合日常使用；USB 连接更稳定，蓝牙不便时可选用。</p>
+
+          <div class="ways">
+            <div class="way">
+              <p class="way-head">蓝牙 <span class="way-badge">推荐</span></p>
+
+              <ol class="os-only" data-for="windows">
+                <li>打开「设置 → 蓝牙和设备 → 添加设备 → 蓝牙」，等列表中出现 <strong>AgentCore-Light</strong>，选中它。</li>
+                <li>点进它的<strong>设备详情页，再点一次「连接」</strong>。仅完成配对还不够，这一步必须操作。</li>
+                <li>回到客户端，点「<strong>启动蓝牙模式</strong>」。</li>
+              </ol>
+              <p class="os-only" data-for="windows"><small>在 Windows 中它可能显示为<strong>音频设备</strong>，名称也不相同——这是为了让 Windows 稳定管理连接，不会播放电脑声音。</small></p>
+
+              <ol class="os-only" data-for="macos">
+                <li>在客户端里点「<strong>启动蓝牙模式</strong>」，软件会自动搜索并连接。</li>
+                <li>无需在系统「蓝牙」设置中手动添加。</li>
+              </ol>
+
+              <ol class="os-only" data-for="linux">
+                <li>在客户端里点「<strong>启动蓝牙模式</strong>」，软件会自动搜索并连接。</li>
+                <li>无需在系统蓝牙设置中手动添加。若电脑没有蓝牙，请使用右侧的 USB 方式。</li>
+              </ol>
+            </div>
+
+            <div class="way">
+              <p class="way-head">USB 线 <span class="way-badge way-badge-plain">蓝牙不方便时</span></p>
+              <ol>
+                <li>在设备上<strong>短按一次按键</strong>，切换到 USB 串口模式（黄灯闪烁）。</li>
+                <li>用<strong>可传输数据的 Type-C 线</strong>连接到电脑。部分线缆仅支持充电，无法识别设备，请更换一根。</li>
+                <li>在客户端里点「<strong>启动 USB 串口模式</strong>」。</li>
+              </ol>
+              <div class="os-only" data-for="linux">
+                <p>首次使用 USB 需先为当前账户授予串口权限，执行后请<strong>注销并重新登录</strong>（仅关闭终端窗口无效）：</p>
+                <p class="step-command">sudo usermod -aG dialout $USER</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout-tip">
+            <p><strong>连接成功的标志：设备绿灯呼吸（缓慢地一亮一暗），客户端显示设备已连接。</strong>两种连接不能同时开启；如需切换，短按按键即可。</p>
+          </div>
+        </div>
+      </li>
+
+      <li class="step" data-reveal>
+        <div class="step-num" aria-hidden="true">4</div>
+        <div class="step-body">
+          <h3>测试灯光与蜂鸣器 <span class="step-tag">所有系统一样</span></h3>
+          <ol>
+            <li>客户端启动后会自动打开一个浏览器页面，即控制台。若未自动打开，请手动访问 <code>http://127.0.0.1:18793/</code>。</li>
+            <li>在「灯光控制」中分别点击红灯、黄灯、绿灯，确认设备同步亮起。</li>
+            <li>点击蜂鸣器，确认是否有提示音。</li>
+          </ol>
+          <p>灯光与蜂鸣器均正常，即表示设备工作正常，可以开始使用。</p>
+          <div class="callout callout-tip">
+            <p><strong>三项都正常，现在可以贴磁铁片了。</strong>如果哪一项不正常，请先别贴，联系我们处理——磁铁片撕开背胶粘贴后不支持无理由退货。</p>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <!-- ================= 摆放 ================= -->
+<h2 class="section-title" id="mount">两种摆放方式</h2>
+    <p class="section-sub">四步都测过之后，再来决定设备放在哪里。可以挂在显示器侧面，也可以立在桌面上，包装内附有一片磁铁片。</p>
+    <div class="mount-cards">
+      <article class="mount-card" data-reveal>
+        <div class="mount-figure">
+          <svg class="mount-art" viewBox="0 0 240 150" aria-hidden="true">
+            <rect class="frame" x="26" y="16" width="116" height="86" rx="7"/>
+            <rect class="screen" x="34" y="24" width="100" height="70" rx="4"/>
+            <rect class="frame" x="78" y="102" width="12" height="18"/>
+            <rect class="frame" x="58" y="120" width="52" height="7" rx="3.5"/>
+            <rect class="plate" x="142" y="40" width="6" height="60" rx="3"/>
+            <circle class="loop" cx="170" cy="13" r="6"/>
+            <rect class="dev" x="148" y="20" width="44" height="100" rx="9"/>
+            <circle class="lamp-r" cx="170" cy="46" r="13"/>
+            <circle class="lamp-y" cx="170" cy="72" r="13"/>
+            <circle class="lamp-g" cx="170" cy="98" r="13"/>
+          </svg>
+        </div>
+        <h3>侧面磁吸 · 挂在显示器侧面</h3>
+        <p>把磁铁片贴在显示器侧面，设备吸附上去、挂在屏幕边缘。不占桌面空间，抬眼就能看到当前状态。</p>
+      </article>
+      <article class="mount-card" data-reveal>
+        <div class="mount-figure">
+          <svg class="mount-art" viewBox="0 0 240 150" aria-hidden="true">
+            <rect class="frame" x="18" y="122" width="204" height="9" rx="4.5"/>
+            <rect class="plate" x="96" y="116" width="48" height="6" rx="3"/>
+            <circle class="loop" cx="120" cy="9" r="6"/>
+            <rect class="dev" x="98" y="16" width="44" height="100" rx="9"/>
+            <circle class="lamp-r" cx="120" cy="42" r="13"/>
+            <circle class="lamp-y" cx="120" cy="68" r="13"/>
+            <circle class="lamp-g" cx="120" cy="94" r="13"/>
+          </svg>
+        </div>
+        <h3>底面磁吸 · 立在桌面上</h3>
+        <p>把磁铁片贴在桌面上，设备吸附固定、立在桌上，摆放位置更灵活，也不容易被碰倒。</p>
+      </article>
+    </div>
+    <ol class="mount-steps" data-reveal>
+      <li><strong>确认设备正常：</strong>如果第 4 步的灯光和蜂鸣器测试还没做完，请先做完再贴。</li>
+      <li><strong>擦净设备：</strong>外壳上有灰尘或指纹，用包装内附带的酒精棉片擦拭一遍。</li>
+      <li><strong>贴上磁铁片：</strong>撕开磁铁片的背胶，贴紧在选好的位置——显示器侧面或桌面。</li>
+      <li><strong>吸附设备：</strong>把设备贴到磁铁片上，轻推一下确认吸稳。</li>
+    </ol>
+
+    <!-- ================= 灯效速查 ================= -->
+    <h2 class="section-title" id="lamps">状态灯含义速查</h2>
+    <p class="section-sub">日常使用中可随时查阅。红、黄、绿三颗状态灯的含义固定不变。</p>
+
+    <h3 class="section-title section-title-sub">还没连 AI 工具时</h3>
+    <div class="lamp-list" data-reveal>
+      <div class="lamp-row">
+        <span class="chip chip-all">三色灯短暂亮起</span>
+        <p class="lamp-mean">正在开机，请稍候。</p>
+      </div>
+      <div class="lamp-row">
+        <span class="chip chip-red chip-blink">红灯闪烁</span>
+        <p class="lamp-mean">蓝牙模式，等待电脑连接。</p>
+      </div>
+      <div class="lamp-row">
+        <span class="chip chip-yellow chip-blink">黄灯闪烁</span>
+        <p class="lamp-mean">USB 模式，等待客户端连接。</p>
+      </div>
+      <div class="lamp-row">
+        <span class="chip chip-green chip-breathe">绿灯呼吸</span>
+        <p class="lamp-mean">已连接，空闲待命。<strong>看到绿灯缓慢地一亮一暗即表示连接正常。</strong></p>
+      </div>
+      <div class="lamp-row">
+        <span class="chip chip-off">所有状态灯熄灭</span>
+        <p class="lamp-mean">已关机。长按按键 3 秒重新开机。</p>
+      </div>
+    </div>
+
+    <h3 class="section-title section-title-sub">AI 工具接管后</h3>
+    <div class="ai-states ai-states-quiet">
+      <article class="ai-state" data-state="idle" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>空闲 IDLE</h3>
+        <p>没有任务执行，<strong>绿灯低亮度呼吸</strong>。连续空闲 10 分钟会自动熄灯休眠，有新任务时自动亮起。</p>
+      </article>
+      <article class="ai-state" data-state="busy" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>工作 BUSY</h3>
+        <p>正在执行任务，<strong>黄灯慢闪</strong>（约 1 秒一次）。</p>
+      </article>
+      <article class="ai-state" data-state="wait" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>等待确认 WAIT_CONFIRM</h3>
+        <p>需要你确认授权，<strong>黄灯常亮</strong>。</p>
+      </article>
+      <article class="ai-state" data-state="error" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>报错 ERROR</h3>
+        <p>任务失败或出错，<strong>红灯快闪</strong>。</p>
+      </article>
+      <article class="ai-state" data-state="success" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>任务完成 SUCCESS</h3>
+        <p>任务成功，<strong>绿灯呼吸</strong>并响一声「上行提示」音，5 秒后回到空闲。任务完成<strong>以这声提示音为准</strong>。</p>
+        <span class="ai-beep">上行提示音</span>
+      </article>
+    </div>
+
+    <!-- ================= 按键 ================= -->
+    <h2 class="section-title" id="keys">按键只有一个，三种按法</h2>
+    <p class="section-sub">机身只有一个按键，短按和长按对应不同功能。</p>
+    <div class="keys">
+      <article class="key-card" data-reveal>
+        <div class="key-figure">
+          <span class="key-cap key-tap" aria-hidden="true"></span>
+          <strong>短按一下</strong>
+        </div>
+        <p>在<strong>蓝牙模式</strong>（红灯闪）和 <strong>USB 模式</strong>（黄灯闪）之间切换。两种连接只能开启一种，切换时短按即可。</p>
+      </article>
+      <article class="key-card" data-reveal>
+        <div class="key-figure">
+          <span class="key-cap key-hold" aria-hidden="true"></span>
+          <strong>长按 3 秒</strong>
+        </div>
+        <p><strong>开机</strong>和<strong>关机</strong>都是长按 3 秒。关机后所有状态灯熄灭，最为省电；插入 USB 线也不会自动开机，仍需长按按键。</p>
+      </article>
+      <article class="key-card" data-reveal>
+        <div class="key-figure">
+          <span class="key-cap" aria-hidden="true">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
+              <rect x="2.6" y="8" width="18.8" height="8" rx="4" stroke="currentColor" stroke-width="1.7"/>
+              <rect x="7.6" y="10.8" width="8.8" height="2.4" rx="1.2" fill="currentColor"/>
+            </svg>
+          </span>
+          <strong>Type-C 充电</strong>
+        </div>
+        <p>用 Type-C 线充电，可边充边用。电量、电压、是否正在充电，均可在控制台中查看。</p>
+      </article>
+    </div>
+
+    <!-- ================= 卡住了 ================= -->
+    <h2 class="section-title" id="fixes">卡住了？</h2>
+    <p class="section-sub">下面这几条能解决绝大多数问题，点开即可查看。</p>
+    <div class="fixes">
+      <details class="fix" data-reveal>
+        <summary>红灯一直在闪，连不上</summary>
+        <div class="fix-body">
+          <p>红灯闪烁表示设备工作正常，正在等待电脑连接。问题通常出在电脑一侧：</p>
+          <ol>
+            <li><strong>Windows：仅在客户端点击「启动蓝牙模式」不够。</strong>需先在「设置 → 蓝牙和设备」中完成配对，再进入设备详情页点击一次「连接」，然后回到客户端启动蓝牙模式。</li>
+            <li>确认设备未被其他电脑或手机连接——蓝牙一次只能连接一台设备。</li>
+            <li>若始终无法连接，可改用 USB：短按一次按键切换至黄灯闪烁，插入数据线，并在客户端点击「启动 USB 串口模式」。</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>黄灯一直在闪，连不上</summary>
+        <div class="fix-body">
+          <p>黄灯闪烁表示设备已切换到 USB 模式，正在等待客户端连接。请逐项确认：</p>
+          <ul>
+            <li>是否已在客户端点击「<strong>启动 USB 串口模式</strong>」？</li>
+            <li>数据线是否<strong>仅支持充电</strong>？请更换一根可传输数据的 Type-C 线。</li>
+            <li>设备是否确实处于 USB 模式？<strong>短按一次按键</strong>可在两种模式间切换。</li>
+            <li>Linux：是否已授予串口权限？授权后需<strong>注销并重新登录</strong>才生效，仅关闭终端窗口无效。</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>客户端说连上了，但灯不亮</summary>
+        <div class="fix-body">
+          <ul>
+            <li>请先在控制台的「灯光控制」中<strong>手动点击红灯</strong>。若灯正常亮起，说明连接没有问题。</li>
+            <li>检查<strong>亮度是否被调至 0%</strong>。</li>
+            <li>AI 工具接管灯光后，灯光会跟随 AI 的状态变化。空闲时为<strong>绿灯低亮度呼吸</strong>，亮度较低属于正常现象。</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>过一会儿灯自己灭了</summary>
+        <div class="fix-body">
+          <p><strong>属于正常现象，并非故障。</strong>AI 工具接管灯光后，连续空闲 10 分钟（默认）会自动熄灭全部状态灯并进入休眠以节省电量，连接不会中断——AI 有新任务时会自动亮起，无需按任何按键。</p>
+          <p>如需调整时长或关闭该功能，请查阅完整手册第 8 章。</p>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>设备自己关机了</summary>
+        <div class="fix-body">
+          <p><strong>同样属于正常现象。</strong>蓝牙模式下，连续 5 分钟无连接（电脑关机、蓝牙关闭或客户端退出）设备会自动关机以节省电量，<strong>即使正在通过 USB 充电也会关机</strong>。</p>
+          <p>长按按键 3 秒即可重新开机。该时长同样可以调整或关闭，详见完整手册。</p>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>系统或杀毒软件说这个软件是病毒</summary>
+        <div class="fix-body">
+          <p>软件由独立开发者制作，<strong>未购买付费的代码签名证书</strong>，因此首次运行时可能被 Windows SmartScreen、macOS 的 Gatekeeper 或杀毒软件拦截——<strong>这是缺少签名导致的，并非软件包含病毒</strong>。</p>
+          <p>各系统的提示内容与处理方法，完整手册开头有专门章节说明，按步骤操作即可。</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ================= 通向完整手册 ================= -->
+    <section class="more-box" data-reveal>
+      <div>
+        <h2>需要更多？</h2>
+        <p>按上面四步完成设置即可正常使用。如需调整亮度、休眠与自动关机时间、开机自启，或接入自己的程序，请查阅完整使用手册。</p>
+      </div>
+      <div class="more-links">
+        <a class="more-link" href="windows.html">Windows 手册</a>
+        <a class="more-link" href="macos.html">macOS 手册</a>
+        <a class="more-link" href="linux.html">Linux 手册</a>
+        <a class="more-link" href="api.html">API 调用手册</a>
+      </div>
+    </section>
+
+  </main>
+
+  <button class="to-top" id="toTop" type="button" aria-label="返回顶部">↑</button>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>AgentCore-Light · 快速上手</span>
+      <span class="footer-shop">官方店铺：<a href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener">AgentCore-Light 淘宝店 ↗</a></span>
+    </div>
+  </footer>
+
+  <script src="site.js" defer></script>
+  <script src="quick.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentCore-Light API 使用手册</title>
+  <meta name="description" content="面向开发者的设备文本协议：串口或蓝牙 SPP 直接控制灯光、蜂鸣器与按键事件">
+  <meta name="theme-color" content="#f3f6f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1517" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/api.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/api.html">
+  <link rel="alternate" hreflang="en" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/api.html">
+  <link rel="alternate" hreflang="x-default" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/api.html">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // 尽早套用上次选择的主题，避免刷新时闪白
+    try {
+      var savedTheme = localStorage.getItem('agentcore-manual-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (error) {}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到正文</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header site-header--dense">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>AgentCore-Light<small>客户使用手册</small></span>
+      </a>
+      <div class="header-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <nav class="header-nav" aria-label="手册导航">
+        <a class="tab" href="windows.html">Windows</a>
+        <a class="tab" href="macos.html">macOS</a>
+        <a class="tab" href="linux.html">Linux</a>
+        <a class="tab active" href="api.html" aria-current="page">API调用手册</a>
+        <a class="tab tab-shop" href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener" title="官方店铺 · 售后与配件">官方店铺</a>
+        <a class="tab tab-lang" href="en/api.html" hreflang="en" lang="en" title="Switch to English" data-lang="en">EN</a>
+        <button class="icon-btn" id="printBtn" type="button" aria-label="打印或另存为 PDF" title="打印 / 存为 PDF">🖨️</button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切换深浅色">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap layout" id="content">
+    <aside class="toc-side">
+      <nav class="toc" aria-label="本页目录"><p class="toc-title">本页目录</p><ol><li class="lvl-2"><a href="#download-panel">下载例程</a></li><li class="lvl-2"><a href="#1-接线-连接与首次测试">1. 接线、连接与首次测试</a><ol><li class="lvl-3"><a href="#usb-串口">USB 串口</a></li><li class="lvl-3"><a href="#蓝牙-spp">蓝牙 SPP</a></li><li class="lvl-3"><a href="#python-快速验证">Python 快速验证</a></li></ol></li><li class="lvl-2"><a href="#2-文本格式与回复">2. 文本格式与回复</a></li><li class="lvl-2"><a href="#3-控制会话">3. 控制会话</a></li><li class="lvl-2"><a href="#4-查询接口">4. 查询接口</a></li><li class="lvl-2"><a href="#5-三灯基础控制">5. 三灯基础控制</a></li><li class="lvl-2"><a href="#6-参数化灯效">6. 参数化灯效</a></li><li class="lvl-2"><a href="#7-蜂鸣器">7. 蜂鸣器</a></li><li class="lvl-2"><a href="#8-自定义场景-上传后设备自动播放">8. 自定义场景：上传后设备自动播放</a></li><li class="lvl-2"><a href="#9-停止与设备配置">9. 停止与设备配置</a></li><li class="lvl-2"><a href="#10-python-客户程序示例">10. Python 客户程序示例</a></li><li class="lvl-2"><a href="#11-错误码">11. 错误码</a></li><li class="lvl-2"><a href="#12-上板验收">12. 上板验收</a></li><li class="lvl-2"><a href="#13-升级提示">13. 升级提示</a></li><li class="lvl-2"><a href="#14-按键查询-订阅与短按接管-v0-5-1-新增">14. 按键查询、订阅与短按接管（v0.5.1 新增）</a><ol><li class="lvl-3"><a href="#14-1-默认模式和接管模式">14.1 默认模式和接管模式</a></li><li class="lvl-3"><a href="#14-2-命令和返回">14.2 命令和返回</a></li><li class="lvl-3"><a href="#14-3-python-示例">14.3 Python 示例</a></li><li class="lvl-3"><a href="#14-4-上板测试">14.4 上板测试</a></li></ol></li><li class="lvl-2"><a href="#15-待机休眠与自动关机-v0-5-3-新增">15. 待机休眠与自动关机（v0.5.3 新增）</a></li></ol></nav>
+    </aside>
+
+    <div>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav class="toc" aria-label="本页目录"><p class="toc-title">本页目录</p><ol><li class="lvl-2"><a href="#download-panel">下载例程</a></li><li class="lvl-2"><a href="#1-接线-连接与首次测试">1. 接线、连接与首次测试</a><ol><li class="lvl-3"><a href="#usb-串口">USB 串口</a></li><li class="lvl-3"><a href="#蓝牙-spp">蓝牙 SPP</a></li><li class="lvl-3"><a href="#python-快速验证">Python 快速验证</a></li></ol></li><li class="lvl-2"><a href="#2-文本格式与回复">2. 文本格式与回复</a></li><li class="lvl-2"><a href="#3-控制会话">3. 控制会话</a></li><li class="lvl-2"><a href="#4-查询接口">4. 查询接口</a></li><li class="lvl-2"><a href="#5-三灯基础控制">5. 三灯基础控制</a></li><li class="lvl-2"><a href="#6-参数化灯效">6. 参数化灯效</a></li><li class="lvl-2"><a href="#7-蜂鸣器">7. 蜂鸣器</a></li><li class="lvl-2"><a href="#8-自定义场景-上传后设备自动播放">8. 自定义场景：上传后设备自动播放</a></li><li class="lvl-2"><a href="#9-停止与设备配置">9. 停止与设备配置</a></li><li class="lvl-2"><a href="#10-python-客户程序示例">10. Python 客户程序示例</a></li><li class="lvl-2"><a href="#11-错误码">11. 错误码</a></li><li class="lvl-2"><a href="#12-上板验收">12. 上板验收</a></li><li class="lvl-2"><a href="#13-升级提示">13. 升级提示</a></li><li class="lvl-2"><a href="#14-按键查询-订阅与短按接管-v0-5-1-新增">14. 按键查询、订阅与短按接管（v0.5.1 新增）</a><ol><li class="lvl-3"><a href="#14-1-默认模式和接管模式">14.1 默认模式和接管模式</a></li><li class="lvl-3"><a href="#14-2-命令和返回">14.2 命令和返回</a></li><li class="lvl-3"><a href="#14-3-python-示例">14.3 Python 示例</a></li><li class="lvl-3"><a href="#14-4-上板测试">14.4 上板测试</a></li></ol></li><li class="lvl-2"><a href="#15-待机休眠与自动关机-v0-5-3-新增">15. 待机休眠与自动关机（v0.5.3 新增）</a></li></ol></nav>
+      </details>
+      <article class="guide-content">
+<h1 id="agentcore-设备-api1-调用手册">AgentCore 设备 API1 调用手册</h1>
+<section class="download-panel" id="download-panel" data-reveal><div class="download-panel-copy"><span class="download-panel-kicker">第一步 · 下载例程</span><h2>下载 Python 例程</h2><p>压缩包里是本手册的 Markdown 原文和 <code>agentcore_api.py</code>（封装了收发、会话续期、场景上传、事件分发）。例程可直接放进你的项目，需要 Python 3 和 <code>pyserial</code>；两个文件也可以整包交给你的 AI 当上下文。</p></div><div class="download-panel-actions"><div class="download-item"><a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-API-Python.zip" download>下载 Python 例程 <span>↓</span></a><p class="download-version">适用固件 v0.5.8-jl-breath-bright</p></div></div></section>
+<div class="callout callout-important" data-reveal><p>本 API 适用于 <strong>2026 年 10 月 1 日之后发货的设备</strong>。更早发货的设备出厂固件较旧，不支持本手册描述的 API；如需使用，请联系售后确认能否升级固件。</p><p>第 15 节的休眠设置需要 <strong>v0.5.3 及以上固件</strong>；在更早的固件上这两条命令会被当作未知命令。</p></div>
+<p>适用固件：<code>v0.5.3-jl-sleep</code>，AC696N / BR25。本次 API 是固件中的文本协议，可通过 USB CDC 串口或 Bluetooth Classic SPP/RFCOMM 使用；Python 客户端示例见本页顶部的下载入口。v0.5.1 新增按键查询、订阅和会话内短按接管（第 14 节）；v0.5.3 新增待机休眠与自动关机的设置与上报（第 15 节）。</p>
+<p>客户可以独立控制红、黄、绿三颗灯，使用闪烁、呼吸、渐变、自定义步骤和蜂鸣器音符；不需要为每种业务改固件。</p>
+<h2 id="1-接线-连接与首次测试"><a class="anchor" href="#1-接线-连接与首次测试" aria-label="本节链接">#</a>1. 接线、连接与首次测试</h2>
+<h3 id="usb-串口"><a class="anchor" href="#usb-串口" aria-label="本节链接">#</a>USB 串口</h3>
+<ol>
+<li>长按按键启动设备，短按切换到串口模式。</li>
+<li>连接支持数据传输的 USB 线，找到设备 COM 口。</li>
+<li>关闭占用这个 COM 口的 AgentCore 桌面服务或串口助手。</li>
+<li>客户程序打开串口，115200、8 数据位、无校验、1 停止位，发送 <code>HELLO\n</code>。</li>
+<li>设备回复 <code>HELLO:OK</code>，此后发送 API1 命令。</li>
+</ol>
+<h3 id="蓝牙-spp"><a class="anchor" href="#蓝牙-spp" aria-label="本节链接">#</a>蓝牙 SPP</h3>
+<ol>
+<li>设备开机默认蓝牙模式，在 Windows 设置中配对 AgentCore-Light。</li>
+<li>找到该设备 <code>JL_SPP</code> 的传出/Outgoing COM 口并打开。历史示例是 COM49，实际端口以本机为准。</li>
+<li>与 USB 使用相同文本协议。Windows 音频连接本身不是 SPP 数据通道，必须打开对应 SPP 端口。</li>
+</ol>
+<p>固件现有 BLE 数据入口也接入相同解析器，但本手册的客户示例使用 USB/SPP 串口。设备工作模式仍由按键切换。</p>
+<h3 id="python-快速验证"><a class="anchor" href="#python-快速验证" aria-label="本节链接">#</a>Python 快速验证</h3>
+<p>解压本页顶部下载到的例程，在其中的 <code>AgentCore-API</code> 目录运行：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">powershell</span><button class="copy-btn" type="button">复制</button></div><pre><code>py -3 -m pip install pyserial
+py -3 agentcore_api.py --port COM49
+py -3 agentcore_api.py --port COM49 --demo</code></pre></div>
+<p>第一条调用只查询能力、设置和电池；<code>--demo</code> 会取得控制权，让绿、黄、红各亮一秒，然后短鸣一次，最后释放控制权。灯亮度和蜂鸣器仍受设备保存的设置限制。</p>
+<h2 id="2-文本格式与回复"><a class="anchor" href="#2-文本格式与回复" aria-label="本节链接">#</a>2. 文本格式与回复</h2>
+<p>一行命令的格式：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=1 TOKEN=42 LED.SET R=0 Y=0 G=300</code></pre></div>
+<ul>
+<li>上面最后必须发送换行 <code>\n</code>；也接受 <code>\r</code>、<code>\r\n</code> 或分号 <code>;</code>。</li>
+<li><code>API1</code>、命令和参数名使用大写。参数用空格或 Tab 分隔，不使用 JSON、引号或中文。</li>
+<li><code>ID</code> 必填，范围 1～65535，客户为每次调用分配编号。参数顺序不限。</li>
+<li>一行最多 255 字节，不含结束符；未知参数、重复参数、非法数字会报错。</li>
+<li>支持分包、粘包。一次接收不需要等于一条命令；超长行会整行丢弃，不执行后半段。</li>
+<li>客户应发送一条、等待相同 ID 的回复，再发送下一条；设备队列最多 8 条。</li>
+</ul>
+<p>成功或失败回复：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=1 OK
+API1 ID=1 ERR CODE=INVALID_ARGUMENT</code></pre></div>
+<p><code>INFO</code>、<code>STATUS</code>、<code>SOUND.LIST</code> 可能先返回额外数据行，最后才是同 ID 的 <code>OK</code>。设备还会发送电池遥测、旧协议回复和异步事件；客户须按前缀及 ID 分类。</p>
+<p><code>OK</code> 表示命令已由设备定时任务执行，不表示场景已播完。长场景通过 <code>SCENE_DONE</code> 事件报告结束。队列满或超长行无法可靠提取请求编号时，返回 <code>ID=0</code> 错误。</p>
+<h2 id="3-控制会话"><a class="anchor" href="#3-控制会话" aria-label="本节链接">#</a>3. 控制会话</h2>
+<p>查询无需取得控制权。灯光、声音、场景和设置写入需要先打开会话：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=1 TOKEN=42 SESSION.OPEN LEASE_MS=30000</code></pre></div>
+<p><code>TOKEN</code> 由客户选择，范围 1～65535。它是避免多个控制程序互相抢占的会话编号，不是密码。<code>LEASE_MS</code> 默认为 30000，范围 1000～600000。</p>
+<p>后续写入使用相同 TOKEN。另一个 TOKEN 请求接管会返回 <code>BUSY</code>；同一 TOKEN 再次 OPEN 可以续期。</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=2 TOKEN=42 SESSION.KEEPALIVE
+API1 ID=3 TOKEN=42 SESSION.CLOSE</code></pre></div>
+<p>成功执行的会话写入命令会续期；普通查询不会续期。建议每 10 秒发送一次 KEEPALIVE，或使用示例客户端，它会自动续期。</p>
+<p>自定义控制期间，旧状态/灯效/声音命令返回 <code>ERR API_BUSY</code>。旧的查询与设备偏好设置仍可使用。低电量空闲提醒不会覆盖自定义输出。</p>
+<p>会话 CLOSE、超时、SPP/BLE 业务连接断开、USB 断开、关机或切换模式会停止自定义输出。主动释放或检测到断连后，设备恢复已有的连接等待/IDLE 指示规则。USB 应用关闭端口时，CDC 不一定产生可靠关闭事件，因此需发送 CLOSE 或旧命令 <code>HOST_DISCONNECT</code>；否则由会话超时兜底。</p>
+<p>关机状态下不接受 API 输出控制，也不能通过 API 开机。</p>
+<h2 id="4-查询接口"><a class="anchor" href="#4-查询接口" aria-label="本节链接">#</a>4. 查询接口</h2>
+<div class="table-wrap" data-reveal><table><tbody><tr><th>命令</th><th>内容</th></tr><tr><td><code>PING</code></td><td>API 探活，回复 OK</td></tr><tr><td><code>INFO</code></td><td>API 版本、支持效果、64 步上限、255 字节行上限、队列及定时节拍</td></tr><tr><td><code>STATUS</code></td><td>开机态、OWNER、场景 PLAYING/INDEX/COUNT、剩余租期及当前输出</td></tr><tr><td><code>POWER.GET</code></td><td>CHG、VBAT、PER、CUR</td></tr><tr><td><code>SETTINGS.GET</code></td><td>当前总亮度、蜂鸣器开关、总响度、低电量提醒、固件版本</td></tr><tr><td><code>SOUND.LIST</code></td><td>当前固件全部预置声音名称，最后一行 OK END=1</td></tr><tr><td><code>BUTTON.GET</code></td><td>实体按键 PRESSED、短按 MODE、SUBSCRIBED 和 OWNER</td></tr></tbody></table></div>
+<p>示例：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=10 INFO
+API1 ID=11 SETTINGS.GET
+API1 ID=12 POWER.GET</code></pre></div>
+<p>POWER.GET：<code>VBAT</code> 单位为 0.01V；<code>PER</code> 是电压估算百分比；<code>CUR</code> 是充电配置目标 mA，不是外部电流表实测值。</p>
+<p>STATUS 的 OUTPUT R/Y/G 是 0～300 的逻辑输出，尚未乘总亮度和通道校准；EFFECT 为 0 常亮、1 闪烁、2 呼吸、3 渐变。FREQ 表示 API 直接音调，不逐音报告预置旋律。PLAYING 只表示场景是否在播放。</p>
+<h2 id="5-三灯基础控制"><a class="anchor" href="#5-三灯基础控制" aria-label="本节链接">#</a>5. 三灯基础控制</h2>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=20 TOKEN=42 LED.SET R=300 Y=0 G=0
+API1 ID=21 TOKEN=42 LED.SET R=0 Y=150 G=300
+API1 ID=22 TOKEN=42 LED.SET R=0 Y=0 G=0</code></pre></div>
+<p>R/Y/G 各为 0～300，省略为 0；一条命令完整设置三路，不会保留省略通道的上次值。可同时亮多颗独立灯，不能混出一颗 RGB 灯的颜色。</p>
+<p><code>DURATION_MS</code> 可选，0 表示保持到下一条命令或会话终止；非零范围 20～60000，时间到后三灯熄灭：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=23 TOKEN=42 LED.SET G=300 DURATION_MS=1000</code></pre></div>
+<p>API 通道档位是相对强度，仍乘上客户的总亮度与原有通道校准。总亮度默认 30/300，约为满输出的 10%；此时 R=300 为红灯约 10% PWM，R=150 约为 5%。绿灯原有 65% 校准继续生效。</p>
+<p>当前底层 PWM 为 100 个输出步长，逻辑 300 档在换算后会有相邻档位相同；极低档位可能舍入为 0。API1 没有改变 PWM 定时器的频率或硬件分辨率。</p>
+<h2 id="6-参数化灯效"><a class="anchor" href="#6-参数化灯效" aria-label="本节链接">#</a>6. 参数化灯效</h2>
+<p>使用 <code>LED.EFFECT</code>，R/Y/G 与 LED.SET 相同：</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>EFFECT</th><th>参数</th><th>行为</th></tr><tr><td>SOLID</td><td>DURATION_MS 可选</td><td>常亮，与 LED.SET 相同</td></tr><tr><td>BLINK</td><td>ON_MS、OFF_MS，各默认 500，范围 20～60000</td><td>亮/灭交替，可自定义占空时长</td></tr><tr><td>BREATHE</td><td>PERIOD_MS 默认 2000，范围 40～60000</td><td>三角形亮度曲线：暗→亮→暗</td></tr><tr><td>FADE</td><td>DURATION_MS 必填，20～60000</td><td>从当前显示值渐变到目标，结束后保持目标</td></tr></tbody></table></div>
+<p>BLINK/BREATHE/SOLID 的 DURATION_MS 为 0 时持续执行，非零时到期熄灭；FADE 的 DURATION_MS 是过渡时间。</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=30 TOKEN=42 LED.EFFECT EFFECT=BLINK R=300 ON_MS=200 OFF_MS=800
+API1 ID=31 TOKEN=42 LED.EFFECT EFFECT=BREATHE G=300 PERIOD_MS=3000
+API1 ID=32 TOKEN=42 LED.EFFECT EFFECT=FADE Y=300 DURATION_MS=1000</code></pre></div>
+<p>LED 命令不取消独立播放的蜂鸣器。但如果正在播放灯声组合场景，新的 LED 或蜂鸣器控制命令会取消整个场景，避免两套执行逻辑争用外设。</p>
+<h2 id="7-蜂鸣器"><a class="anchor" href="#7-蜂鸣器" aria-label="本节链接">#</a>7. 蜂鸣器</h2>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=40 TOKEN=42 BUZZER.TONE FREQ=2700 VOLUME=50 DURATION_MS=200
+API1 ID=41 TOKEN=42 BUZZER.STOP
+API1 ID=42 TOKEN=42 SOUND.PLAY NAME=CLASSIC LOOP=0</code></pre></div>
+<ul>
+<li>TONE 的 FREQ 必填：0 静音，非零范围 95～10000Hz。2700Hz 适合当前蜂鸣器，实际响度随频率变化。</li>
+<li>VOLUME 默认 100，范围 0～100，为相对总响度的比例；DURATION_MS 默认 200，范围 20～60000。</li>
+<li>设备总响度默认 10；例如相对 50 表示使用总响度的一半。总开关关闭、总响度 0 或相对响度 0 均静音。</li>
+<li>API 直接音调在总响度与相对响度均为 100 时，PWM 占空比封顶 50%。响度百分比不是分贝，也不是线性声压。</li>
+<li>预置 SOUND 的 LOOP 默认为 0，1 表示循环，仍受会话租期限制。预置声音沿用原有音量与节拍逻辑。</li>
+<li>BUZZER.STOP 会取消正在运行的组合场景；停止独立声音时保留独立灯效。</li>
+</ul>
+<p>当前预置名称可通过 SOUND.LIST 获取，包括 CLASSIC、UP、DOWN、OK、ALERT、SOFT、CHIME、POP、DONE，以及 MELODY_RISE、MELODY_HAPPY 等旋律。不依赖写死的列表，客户程序应优先查询。</p>
+<h2 id="8-自定义场景-上传后设备自动播放"><a class="anchor" href="#8-自定义场景-上传后设备自动播放" aria-label="本节链接">#</a>8. 自定义场景：上传后设备自动播放</h2>
+<p>一个场景最多 64 步，每一步完整指定三灯、灯效、声音及持续时间。下一步未设置的灯和声音默认为关闭。</p>
+<p>流程：BEGIN → STEP（每一步）→ COMMIT → PLAY。每条等待 ACK 后再发送。</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=50 TOKEN=42 SCENE.BEGIN COUNT=4
+API1 ID=51 TOKEN=42 SCENE.STEP INDEX=0 G=300 DURATION_MS=1000
+API1 ID=52 TOKEN=42 SCENE.STEP INDEX=1 Y=300 DURATION_MS=1000
+API1 ID=53 TOKEN=42 SCENE.STEP INDEX=2 R=300 DURATION_MS=1000
+API1 ID=54 TOKEN=42 SCENE.STEP INDEX=3 FREQ=2700 VOLUME=50 DURATION_MS=200
+API1 ID=55 TOKEN=42 SCENE.COMMIT
+API1 ID=56 TOKEN=42 SCENE.PLAY REPEAT=1</code></pre></div>
+<ul>
+<li>COUNT 为 1～64，INDEX 从 0 开始。</li>
+<li>STEP 支持 R/Y/G、EFFECT、ON_MS、OFF_MS、PERIOD_MS、FREQ、VOLUME，含义同前。DURATION_MS 每一步必填，20～60000。</li>
+<li>同一 INDEX 可重传覆盖；只有所有 INDEX 齐全才可 COMMIT。非法参数不修改已接收步骤。</li>
+<li>BEGIN 和 STEP 放在待提交缓冲区，不会边上传边播放。COMMIT 完整校验后才替换场景。</li>
+<li>正在播放时可上传下一场景，但 COMMIT 返回 SCENE_RUNNING；先 CANCEL 或等当前播放结束。</li>
+<li>REPEAT 默认 1，范围 0～1000；0 无限循环，需要续期。</li>
+<li>有限播放完成后三灯与直接音调关闭，会话仍归客户，便于发送下一条操作。使用 SESSION.CLOSE 恢复连接/IDLE 指示。</li>
+<li>场景保存在 RAM；关闭会话、切换模式或重启会丢失，须重新上传。</li>
+<li>执行节拍约 20ms，适合状态灯与提示音，不用于微秒级时序。</li>
+</ul>
+<p>开始/完成/取消事件：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 EVENT=SCENE_STARTED TOKEN=42 PLAY_ID=56
+API1 EVENT=SCENE_DONE TOKEN=42 PLAY_ID=56
+API1 EVENT=SCENE_CANCELLED TOKEN=42 PLAY_ID=56</code></pre></div>
+<p>PLAY_ID 是启动该轮播放的请求 ID，可用它区分同一会话的不同播放。</p>
+<p>交替闪烁：分别上传红灯亮、黄灯亮两步，然后 REPEAT=0。自定义旋律：上传每个音符的 FREQ/VOLUME/DURATION_MS，停顿步骤使用 FREQ=0。灯声同步：同一步同时设置灯参数与 FREQ。</p>
+<h2 id="9-停止与设备配置"><a class="anchor" href="#9-停止与设备配置" aria-label="本节链接">#</a>9. 停止与设备配置</h2>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=60 TOKEN=42 SCENE.CANCEL
+API1 ID=61 TOKEN=42 OUTPUT.STOP
+API1 ID=62 TOKEN=42 SETTINGS.SET BRIGHTNESS=30 BUZZER=1 VOLUME=10 LOW_BATTERY_ALERT=1 SAVE=1</code></pre></div>
+<p>SCENE.CANCEL 停止当前场景并关闭其输出，没有场景时不改变独立灯光/声音。OUTPUT.STOP 停止所有自定义灯光和声音，保留会话和已提交场景。</p>
+<p>SETTINGS.SET 支持：</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>参数</th><th>范围</th><th>说明</th></tr><tr><td>BRIGHTNESS</td><td>0～300</td><td>总亮度，默认 30</td></tr><tr><td>BUZZER</td><td>0/1</td><td>总蜂鸣器开关</td></tr><tr><td>VOLUME</td><td>0～100</td><td>总响度，默认 10</td></tr><tr><td>LOW_BATTERY_ALERT</td><td>0/1</td><td>低电量空闲提醒</td></tr><tr><td>SAVE</td><td>0/1，默认 0</td><td>0 只改当前运行值；1 延迟约 1 秒保存设备配置</td></tr></tbody></table></div>
+<p>省略的设置保持当前值。SAVE=1 也可单独发送以保存整组当前配置。保存按请求时的快照执行；等待看到旧格式 <code>SETTINGS:...STORE:VM</code> 回执后再断电。短时间内多次保存会合并为最后一次请求。</p>
+<p>临时设置不会因 SESSION.CLOSE 自动还原；断电重启从设备存储恢复。场景和每次播放不写 Flash。</p>
+<h2 id="10-python-客户程序示例"><a class="anchor" href="#10-python-客户程序示例" aria-label="本节链接">#</a>10. Python 客户程序示例</h2>
+<p>将下载到的 <code>agentcore_api.py</code> 放在客户脚本同目录：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">python</span><button class="copy-btn" type="button">复制</button></div><pre><code>from agentcore_api import AgentCoreAPI
+
+with AgentCoreAPI(&quot;COM49&quot;) as api:
+    print(api.request(&quot;INFO&quot;))
+    api.acquire()  # 自动续期
+    api.effect(&quot;BREATHE&quot;, green=300, PERIOD_MS=2000)
+    api.tone(frequency=2700, volume=50, duration_ms=200)
+
+    api.play_scene([
+        {&quot;G&quot;: 300, &quot;DURATION_MS&quot;: 1000},
+        {&quot;Y&quot;: 300, &quot;DURATION_MS&quot;: 1000},
+        {&quot;R&quot;: 300, &quot;FREQ&quot;: 2700, &quot;VOLUME&quot;: 50, &quot;DURATION_MS&quot;: 200},
+    ], repeat=1)
+    print(api.wait_scene(timeout=10))
+    # 退出 with 会释放会话并关闭串口</code></pre></div>
+<p>客户自己的 Agent 或业务程序，在事件发生时调用 api.led、api.effect 或 api.play_scene 即可。查询返回的列表包含该次请求的所有 API 数据行；设备错误会抛出 APIError。</p>
+<p>本次交付实现固件协议和串口 Python 客户端。现有软件的 HTTP <code>/command</code> 使用单槽待发送逻辑，不能保证多条场景上传命令全部保留，也没有 API1 完整回执等待；当前不要通过快速连续 HTTP POST 上传场景。新的 HTTP SDK/网页开发者入口需后续单独适配，不能把这里的文本协议当成已经新增的 HTTP 路由。</p>
+<h2 id="11-错误码"><a class="anchor" href="#11-错误码" aria-label="本节链接">#</a>11. 错误码</h2>
+<div class="table-wrap" data-reveal><table><tbody><tr><th>错误</th><th>含义与处理</th></tr><tr><td>BAD_REQUEST</td><td>ID、数字格式、重复字段或命令格式不正确</td></tr><tr><td>UNKNOWN_COMMAND / UNKNOWN_PARAMETER</td><td>命令或参数名错误</td></tr><tr><td>INVALID_ARGUMENT</td><td>参数缺失、越界、非法效果/音效名称</td></tr><tr><td>DEVICE_OFF / NO_LINK</td><td>设备未开机或业务链路未建立</td></tr><tr><td>BUSY / NOT_OWNER / NO_SESSION</td><td>控制会话冲突、TOKEN 不匹配或尚未 OPEN</td></tr><tr><td>LINE_TOO_LONG / QUEUE_FULL</td><td>命令过长或发送过快，调整发送方式</td></tr><tr><td>NO_UPLOAD / INCOMPLETE_SCENE</td><td>尚未 BEGIN 或未上传全部步骤</td></tr><tr><td>NO_SCENE / SCENE_RUNNING</td><td>未提交场景或播放中不能 COMMIT</td></tr></tbody></table></div>
+<p>会话释放事件可能带 REASON=CLIENT、TIMEOUT、LINK_LOST 或 DEVICE_OFF。关机/模式切换会直接复位 API，不保证断开的通道还能收到释放事件。</p>
+<h2 id="12-上板验收"><a class="anchor" href="#12-上板验收" aria-label="本节链接">#</a>12. 上板验收</h2>
+<ol>
+<li>确认旧 IDLE/BUSY/DONE/ERROR、按键开关机、模式切换仍正常。</li>
+<li>运行 Python --demo，确认绿、黄、红各亮一秒，随后短鸣一次，再恢复连接状态。</li>
+<li>验证 BLINK、BREATHE、FADE，以及场景循环和音符停顿。</li>
+<li>连续调用 100 次短蜂鸣，检查不会失效；总开关 OFF 和总响度 0 应完全静音。</li>
+<li>播放中拔线/断开 SPP，或停止续期，检查输出停止并恢复等待/IDLE。</li>
+<li>发送 SAVE=1 后等保存回执再重启，确认配置恢复；SAVE=0 不应成为下一次启动配置。</li>
+<li>把 IDLE_SLEEP_SEC 设成 60，空闲一分钟后确认灯全部熄灭、连接仍在，发送一条状态命令能自动亮回；把 BT_DISCONNECT_OFF_SEC 设成 60，断开蓝牙业务连接一分钟，确认设备自动关机。</li>
+</ol>
+<h2 id="13-升级提示"><a class="anchor" href="#13-升级提示" aria-label="本节链接">#</a>13. 升级提示</h2>
+<p>本版固件扩展了应用区，配置存储布局与旧版本不同。</p>
+<p>升级前，建议先用旧版软件读取并记录总亮度、蜂鸣器开关、总响度和低电量提醒这几项设置；升级后重新确认这些设置与蓝牙配对状态，必要时恢复设置并重新配对。</p>
+<p><code>SAVE=1</code> 可以把设置保存到设备，但不承诺跨不同配置布局自动保留旧数据 —— 需要保留的设置请在升级前自行记录。</p>
+<p>v0.5.3 起，固件在升级时会自动迁移旧布局中的设置（总亮度、蜂鸣器开关、总响度、低电量提醒），升级后不再需要手工重设这几项；仍建议升级后核对一遍，并按第 15 节确认两个休眠时间的默认值是否符合预期。</p>
+<h2 id="14-按键查询-订阅与短按接管-v0-5-1-新增"><a class="anchor" href="#14-按键查询-订阅与短按接管-v0-5-1-新增" aria-label="本节链接">#</a>14. 按键查询、订阅与短按接管（v0.5.1 新增）</h2>
+<p>设备只有一个实体按键（当前板级配置 PB6，按下为低电平）。API 的按键控制只影响开机后的短按，不能关闭长按关机，也不能通过 API 给设备开机。现有 50ms 扫描与约 3 秒长按开关机逻辑不变。</p>
+<h3 id="14-1-默认模式和接管模式"><a class="anchor" href="#14-1-默认模式和接管模式" aria-label="本节链接">#</a>14.1 默认模式和接管模式</h3>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>模式</th><th>开机后短按</th><th>长按约 3 秒</th></tr><tr><td>DEFAULT（默认）</td><td>切换蓝牙/USB 串口模式</td><td>保持原有开关机行为</td></tr><tr><td>APPLICATION（API 接管）</td><td>不切换通信模式；订阅后上报 CLICK，由客户程序决定用途</td><td>保持原有关机行为，API 不能禁用</td></tr></tbody></table></div>
+<ul>
+<li>设备每次启动、建立新 API 会话时均为 DEFAULT，且没有订阅。SESSION.OPEN 本身不接管按键。</li>
+<li>同一个 TOKEN 对已存在会话重复 OPEN 只更新租约，不重置已选的按键模式和订阅；只有释放后重新建立的会话才回到默认。</li>
+<li>APPLICATION 只属于当前控制会话，不写入 Flash/VM。SESSION.CLOSE、租约超时、业务连接断开、关机、工作模式切换都会恢复 DEFAULT 并取消订阅；下一次连接必须重新 OPEN、SUBSCRIBE 和 MODE。</li>
+<li>断连恢复以设备实际检测到链路断开为准。关闭 USB COM 口可能没有可靠的断开事件，正常退出请 CLOSE；异常退出由租约超时兜底，不保证关闭端口后立即恢复。</li>
+<li>按键是否接管与是否订阅相互独立：ENABLE=0 只停止上报，不恢复模式。处于 APPLICATION 时，即使没有订阅，短按仍不会切换模式。需要恢复物理模式切换时，发送 MODE=DEFAULT 或关闭会话。</li>
+<li>短按不会续期租约；仍需 SESSION.KEEPALIVE。Python 客户端 acquire() 会启动自动续期。</li>
+</ul>
+<h3 id="14-2-命令和返回"><a class="anchor" href="#14-2-命令和返回" aria-label="本节链接">#</a>14.2 命令和返回</h3>
+<p>查询（不需要取得会话，不续期）：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=100 BUTTON.GET
+API1 ID=100 OK PRESSED=0 MODE=DEFAULT SUBSCRIBED=0 OWNER=0</code></pre></div>
+<p>PRESSED=1 表示扫描到按住，0 表示松开，更新粒度约 50ms；它不是中断级即时读数。MODE 表示短按用途，SUBSCRIBED 表示当前会话是否订阅，OWNER 为会话 TOKEN 或 0。</p>
+<p>先取得控制会话，再订阅并切换到接管模式。请逐条等待对应 ID 的 OK 后再发送下一条：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=101 TOKEN=42 SESSION.OPEN LEASE_MS=30000
+API1 ID=102 TOKEN=42 BUTTON.SUBSCRIBE ENABLE=1
+API1 ID=103 TOKEN=42 BUTTON.MODE MODE=APPLICATION</code></pre></div>
+<p>BUTTON.SUBSCRIBE 的 ENABLE 必填，范围 0/1；BUTTON.MODE 的 MODE 必填，只接受大写 DEFAULT 或 APPLICATION。两者都必须使用当前会话 TOKEN，成功时回复 API1 ID=对应值 OK，并续期租约。非法参数返回 INVALID_ARGUMENT；没有会话或 TOKEN 不符分别返回 NO_SESSION / NOT_OWNER。</p>
+<p>收到一次有效短按松开后，设备主动上报：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 EVENT=BUTTON TOKEN=42 ACTION=CLICK SEQ=1 HELD_MS=150 MODE=APPLICATION</code></pre></div>
+<ul>
+<li>TOKEN 用于过滤自己会话的事件；此行没有请求 ID，是主动事件，不是命令回执。</li>
+<li>当前只提供 CLICK，不提供 DOWN、UP、双击或 LONG_PRESS。一次长按关机不会同时产生 CLICK。</li>
+<li>HELD_MS 是固件扫描累计的按下时长，单位 ms，精度受 50ms 扫描影响。</li>
+<li>SEQ 是本次运行的短按序号，重启后重新计数，32 位计数可能回绕。未订阅时也可能递增，不要求连续；不要把它当成跨重启的永久标识。</li>
+<li>在 DEFAULT 下也能订阅 CLICK，但短按随后会切换通信模式、断开当前链路，事件可能无法送达。需要可靠地把短按用于客户业务时，应使用 APPLICATION。</li>
+<li>关机和断连不保证最后一条事件送达。客户程序必须处理串口关闭、连接错误和会话超时，不能只靠按键事件判断设备是否关机。</li>
+</ul>
+<p>主动恢复默认按键用途（两条命令可在当前会话内执行）：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>API1 ID=104 TOKEN=42 BUTTON.MODE MODE=DEFAULT
+API1 ID=105 TOKEN=42 BUTTON.SUBSCRIBE ENABLE=0</code></pre></div>
+<p>这不会退出 LED/蜂鸣器 API 会话。若希望同时恢复设备原有连接/IDLE 灯效，再发送 SESSION.CLOSE。</p>
+<h3 id="14-3-python-示例"><a class="anchor" href="#14-3-python-示例" aria-label="本节链接">#</a>14.3 Python 示例</h3>
+<p>先关闭占用 COM 口的桌面服务，再运行：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">powershell</span><button class="copy-btn" type="button">复制</button></div><pre><code>py -3 agentcore_api.py --port COM49 --button-demo</code></pre></div>
+<p>脚本接管短按，等待最多 30 秒。此时短按一次会打印事件并点亮绿灯一秒，然后恢复 DEFAULT、取消订阅并释放会话；长按仍会关机，可能令示例报连接错误/超时，这不是短按事件。COM49 换成实际 USB CDC 或蓝牙传出端口。</p>
+<p>客户业务程序可复用：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">python</span><button class="copy-btn" type="button">复制</button></div><pre><code>import time
+from agentcore_api import AgentCoreAPI
+
+with AgentCoreAPI(&quot;COM49&quot;) as api:
+    api.acquire()
+    api.button_subscribe(True)
+    api.button_mode(&quot;APPLICATION&quot;)
+    print(api.button_get())
+    print(&quot;请短按设备按键&quot;)
+    event = api.wait_button(timeout=30)
+    print(event)
+    api.tone(frequency=2700, volume=50, duration_ms=200)
+    api.led(green=300, duration_ms=1000)
+    time.sleep(1)  # 维持会话到输出完成，否则退出 with 会立即停止灯光与蜂鸣器
+    # 按业务需要继续处理；退出 with 会自动释放会话、恢复默认按键。</code></pre></div>
+<p>wait_button() 和 wait_scene() 消费同一个事件队列，不要同时运行或让多个线程争抢事件。需要同时处理场景、按键等事件时，统一读取 api.events，在一个业务线程中按 EVENT 分发。on_event 回调运行在串口读取线程，不能在回调里直接调用 api.request()/led()/tone() 等等待回执的方法，否则会阻塞读取；应通过自己的线程安全队列把事件交给业务线程。</p>
+<h3 id="14-4-上板测试"><a class="anchor" href="#14-4-上板测试" aria-label="本节链接">#</a>14.4 上板测试</h3>
+<ol>
+<li>不运行 API，短按应照常切换蓝牙/串口，长按约 3 秒仍关机。</li>
+<li>只 OPEN，不发送 BUTTON.MODE，短按仍是模式切换。</li>
+<li>运行 --button-demo，短按时收到 CLICK 且通信不切换。</li>
+<li>APPLICATION 下反复短按，检查一次松开只产生一个 CLICK；长按关机不产生 CLICK。</li>
+<li>设置 ENABLE=0，短按不再上报，但仍处于 APPLICATION；设置 MODE=DEFAULT 后短按恢复模式切换。</li>
+<li>关闭会话、拔 USB/断开 SPP 或停止续期，下一次短按恢复默认行为。重新建立会话时 GET 应显示 DEFAULT、SUBSCRIBED=0。</li>
+<li>设置接管后重启，检查仍为 DEFAULT，不会把接管模式保存到设备。</li>
+</ol>
+<h2 id="15-待机休眠与自动关机-v0-5-3-新增"><a class="anchor" href="#15-待机休眠与自动关机-v0-5-3-新增" aria-label="本节链接">#</a>15. 待机休眠与自动关机（v0.5.3 新增）</h2>
+<p>设备有两个省电动作，时间都可以改：</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>设置</th><th>默认</th><th>说明</th></tr><tr><td><code>IDLE_SLEEP_SEC</code></td><td>600 秒</td><td>连续空闲达到该时间后，熄灭全部状态灯进入休眠。连接保持，收到新的状态命令自动唤醒</td></tr><tr><td><code>BT_DISCONNECT_OFF_SEC</code></td><td>300 秒</td><td>仅蓝牙模式：连续没有业务连接达到该时间后自动关机。插着 USB 充电时同样关机</td></tr></tbody></table></div>
+<p>两项范围都是 0～3600 秒，<strong>0 表示关闭</strong>对应的自动动作；设置延迟约 1 秒写入设备存储，重新上电仍然有效。</p>
+<p>这两个设置没有对应的 API1 操作，使用旧格式文本命令（与 <code>BRIGHTNESS</code> 等设置同一通道，不带 <code>API1</code> 前缀，行尾同样用 <code>\n</code>）：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>IDLE_SLEEP_SEC:600
+BT_DISCONNECT_OFF_SEC:300</code></pre></div>
+<ul>
+<li>参数必须是纯数字，超过 3600 回复 <code>ERR IDLE_SLEEP_SEC</code> / <code>ERR BT_DISCONNECT_OFF_SEC</code>；成功后设备回一行 <code>SLEEP_SETTINGS:...</code>。</li>
+<li><strong>会话打开期间</strong>，设备只放行查询和一部分设置命令，这两条会被回复 <code>ERR API_BUSY</code>；需要修改时先发送 <code>SESSION.CLOSE</code>，或使用没有打开会话的通道。</li>
+<li>查询用 <code>GET_SETTINGS</code>（会话打开期间也可用），设备会额外回一行：</li>
+</ul>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>SLEEP_SETTINGS:IDLE_SLEEP_SEC:600,BT_DISCONNECT_OFF_SEC:300,SLEEP:OFF,STORE:VM</code></pre></div>
+<p><code>SLEEP:ON</code> 表示设备当前正处在熄灯休眠状态。</p>
+<p>休眠期间灯光全部关闭，蓝牙/串口连接和按键扫描保持；收到新的状态命令（<code>IDLE</code>、<code>BUSY</code> 等）后立即恢复灯效。空闲状态的绿灯是低亮度呼吸；把 <code>IDLE_SLEEP_SEC</code> 设为 0 可以关闭自动熄灯，此时空闲状态保持呼吸、不会全灭。</p>
+<div class="callout callout-note" data-reveal><p>打开 API 会话期间设备不会进入休眠；会话释放后重新按空闲时间计时。休眠由固件的状态机管理，API 自定义灯效不受影响。</p></div>
+      </article>
+    </div>
+  </main>
+
+  <button class="to-top" id="toTop" type="button" aria-label="返回顶部">↑</button>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>AgentCore-Light · 客户使用手册</span>
+      <span class="footer-shop">官方店铺：<a href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener">AgentCore-Light 淘宝店 ↗</a></span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+  </script>
+  <script src="site.js" defer></script>
+</body>
+</html>

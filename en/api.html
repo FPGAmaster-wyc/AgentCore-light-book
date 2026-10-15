@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentCore-Light API User Manual</title>
+  <meta name="description" content="The device text protocol for developers: drive lights, buzzer and button events straight over serial or Bluetooth SPP">
+  <meta name="theme-color" content="#f3f6f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1517" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="canonical" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/api.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/api.html">
+  <link rel="alternate" hreflang="en" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/api.html">
+  <link rel="alternate" hreflang="x-default" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/api.html">
+  <link rel="stylesheet" href="../style.css">
+  <script>
+    // 尽早套用上次选择的主题，避免刷新时闪白
+    try {
+      var savedTheme = localStorage.getItem('agentcore-manual-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (error) {}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header site-header--dense">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>AgentCore-Light<small>User Manual</small></span>
+      </a>
+      <div class="header-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <nav class="header-nav" aria-label="Manual navigation">
+        <a class="tab" href="windows.html">Windows</a>
+        <a class="tab" href="macos.html">macOS</a>
+        <a class="tab" href="linux.html">Linux</a>
+        <a class="tab active" href="api.html" aria-current="page">API Manual</a>
+        <a class="tab tab-shop" href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener" title="Official store · Support and accessories">Official store</a>
+        <a class="tab tab-lang" href="../api.html" hreflang="zh-CN" lang="zh" title="切换到中文" data-lang="zh">中文</a>
+        <button class="icon-btn" id="printBtn" type="button" aria-label="Print or save as PDF" title="Print / Save as PDF">🖨️</button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch light / dark theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap layout" id="content">
+    <aside class="toc-side">
+      <nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol><li class="lvl-2"><a href="#download-panel">Download the example</a></li><li class="lvl-2"><a href="#1-wiring-connection-and-first-test">1. Wiring, connection and first test</a><ol><li class="lvl-3"><a href="#usb-serial">USB serial</a></li><li class="lvl-3"><a href="#bluetooth-spp">Bluetooth SPP</a></li><li class="lvl-3"><a href="#python-quick-check">Python quick check</a></li></ol></li><li class="lvl-2"><a href="#2-text-format-and-replies">2. Text format and replies</a></li><li class="lvl-2"><a href="#3-control-sessions">3. Control sessions</a></li><li class="lvl-2"><a href="#4-query-commands">4. Query commands</a></li><li class="lvl-2"><a href="#5-basic-control-of-the-three-lights">5. Basic control of the three lights</a></li><li class="lvl-2"><a href="#6-parameterised-light-effects">6. Parameterised light effects</a></li><li class="lvl-2"><a href="#7-buzzer">7. Buzzer</a></li><li class="lvl-2"><a href="#8-custom-scenes-upload-then-the-device-plays-them-automatically">8. Custom scenes: upload, then the device plays them automatically</a></li><li class="lvl-2"><a href="#9-stopping-and-device-configuration">9. Stopping and device configuration</a></li><li class="lvl-2"><a href="#10-python-client-example">10. Python client example</a></li><li class="lvl-2"><a href="#11-error-codes">11. Error codes</a></li><li class="lvl-2"><a href="#12-on-device-acceptance-testing">12. On-device acceptance testing</a></li><li class="lvl-2"><a href="#13-upgrade-notes">13. Upgrade notes</a></li><li class="lvl-2"><a href="#14-button-queries-subscription-and-short-press-takeover-added-in-v0-5-1">14. Button queries, subscription and short-press takeover (added in v0.5.1)</a><ol><li class="lvl-3"><a href="#14-1-default-mode-and-takeover-mode">14.1 Default mode and takeover mode</a></li><li class="lvl-3"><a href="#14-2-commands-and-responses">14.2 Commands and responses</a></li><li class="lvl-3"><a href="#14-3-python-example">14.3 Python example</a></li><li class="lvl-3"><a href="#14-4-on-device-testing">14.4 On-device testing</a></li></ol></li><li class="lvl-2"><a href="#15-standby-sleep-and-auto-power-off-added-in-v0-5-3">15. Standby sleep and auto power-off (added in v0.5.3)</a></li></ol></nav>
+    </aside>
+
+    <div>
+      <details class="toc-mobile">
+        <summary>On this page</summary>
+        <nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol><li class="lvl-2"><a href="#download-panel">Download the example</a></li><li class="lvl-2"><a href="#1-wiring-connection-and-first-test">1. Wiring, connection and first test</a><ol><li class="lvl-3"><a href="#usb-serial">USB serial</a></li><li class="lvl-3"><a href="#bluetooth-spp">Bluetooth SPP</a></li><li class="lvl-3"><a href="#python-quick-check">Python quick check</a></li></ol></li><li class="lvl-2"><a href="#2-text-format-and-replies">2. Text format and replies</a></li><li class="lvl-2"><a href="#3-control-sessions">3. Control sessions</a></li><li class="lvl-2"><a href="#4-query-commands">4. Query commands</a></li><li class="lvl-2"><a href="#5-basic-control-of-the-three-lights">5. Basic control of the three lights</a></li><li class="lvl-2"><a href="#6-parameterised-light-effects">6. Parameterised light effects</a></li><li class="lvl-2"><a href="#7-buzzer">7. Buzzer</a></li><li class="lvl-2"><a href="#8-custom-scenes-upload-then-the-device-plays-them-automatically">8. Custom scenes: upload, then the device plays them automatically</a></li><li class="lvl-2"><a href="#9-stopping-and-device-configuration">9. Stopping and device configuration</a></li><li class="lvl-2"><a href="#10-python-client-example">10. Python client example</a></li><li class="lvl-2"><a href="#11-error-codes">11. Error codes</a></li><li class="lvl-2"><a href="#12-on-device-acceptance-testing">12. On-device acceptance testing</a></li><li class="lvl-2"><a href="#13-upgrade-notes">13. Upgrade notes</a></li><li class="lvl-2"><a href="#14-button-queries-subscription-and-short-press-takeover-added-in-v0-5-1">14. Button queries, subscription and short-press takeover (added in v0.5.1)</a><ol><li class="lvl-3"><a href="#14-1-default-mode-and-takeover-mode">14.1 Default mode and takeover mode</a></li><li class="lvl-3"><a href="#14-2-commands-and-responses">14.2 Commands and responses</a></li><li class="lvl-3"><a href="#14-3-python-example">14.3 Python example</a></li><li class="lvl-3"><a href="#14-4-on-device-testing">14.4 On-device testing</a></li></ol></li><li class="lvl-2"><a href="#15-standby-sleep-and-auto-power-off-added-in-v0-5-3">15. Standby sleep and auto power-off (added in v0.5.3)</a></li></ol></nav>
+      </details>
+      <article class="guide-content">
+<h1 id="agentcore-device-api1-manual">AgentCore Device API1 Manual</h1>
+<section class="download-panel" id="download-panel" data-reveal><div class="download-panel-copy"><span class="download-panel-kicker">Step 1 · Get the example</span><h2>Download the Python example</h2><p>The zip holds this manual in Markdown plus <code>agentcore_api.py</code> (framing, receive/send, session renewal, scene upload, event dispatch). Drop it straight into your project — it needs Python 3 and <code>pyserial</code>. You can also hand both files to your AI as context.</p></div><div class="download-panel-actions"><div class="download-item"><a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-API-Python.zip" download>Download the Python example <span>↓</span></a><p class="download-version">Firmware v0.5.8-jl-breath-bright</p></div></div></section>
+<div class="callout callout-important" data-reveal><p>This API applies to <strong>devices shipped on or after 1 October 2026</strong>. Devices shipped earlier have older factory firmware and do not support the API described in this manual; if you need it, contact after-sales support to find out whether the firmware can be upgraded.</p><p>The sleep settings in section 15 require <strong>firmware v0.5.3 or later</strong>; on earlier firmware those two commands are treated as unknown commands.</p></div>
+<p>Compatible firmware: <code>v0.5.3-jl-sleep</code>, AC696N / BR25. This API is the text protocol in the firmware, usable over the USB CDC serial port or Bluetooth Classic SPP/RFCOMM; for the Python client example, see the download entry at the top of this page. v0.5.1 added button queries, subscription and short-press takeover within a session (section 14); v0.5.3 added the settings and reporting for standby sleep and auto power-off (section 15).</p>
+<p>You can control the red, yellow and green lights independently, and use blinking, breathing, fading, custom step sequences and buzzer tones; no firmware change is needed for each new use case.</p>
+<h2 id="1-wiring-connection-and-first-test"><a class="anchor" href="#1-wiring-connection-and-first-test" aria-label="Link to this section">#</a>1. Wiring, connection and first test</h2>
+<h3 id="usb-serial"><a class="anchor" href="#usb-serial" aria-label="Link to this section">#</a>USB serial</h3>
+<ol>
+<li>Press and hold the button to power the device on, then short-press it to switch to serial mode.</li>
+<li>Connect a USB cable that supports data transfer, and find the device’s COM port.</li>
+<li>Close the AgentCore desktop service or serial terminal that is holding this COM port.</li>
+<li>Your program opens the serial port at 115200 baud, 8 data bits, no parity, 1 stop bit, and sends <code>HELLO\n</code>.</li>
+<li>The device replies <code>HELLO:OK</code>; after that you can send API1 commands.</li>
+</ol>
+<h3 id="bluetooth-spp"><a class="anchor" href="#bluetooth-spp" aria-label="Link to this section">#</a>Bluetooth SPP</h3>
+<ol>
+<li>The device starts in Bluetooth mode by default; pair <code>AgentCore-Light</code> in Windows Settings.</li>
+<li>Find and open the outgoing COM port of the device’s <code>JL_SPP</code> service. Earlier examples use COM49; the actual port is whatever your computer shows.</li>
+<li>It uses the same text protocol as USB. The Windows audio connection is not itself an SPP data channel — you must open the matching SPP port.</li>
+</ol>
+<p>The firmware’s existing BLE data entry point also feeds the same parser, but the examples in this manual use the USB/SPP serial port. The device’s operating mode is still switched with the button.</p>
+<h3 id="python-quick-check"><a class="anchor" href="#python-quick-check" aria-label="Link to this section">#</a>Python quick check</h3>
+<p>Unzip the examples downloaded from the top of this page and run the following inside the <code>AgentCore-API</code> directory:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">powershell</span><button class="copy-btn" type="button">Copy</button></div><pre><code>py -3 -m pip install pyserial
+py -3 agentcore_api.py --port COM49
+py -3 agentcore_api.py --port COM49 --demo</code></pre></div>
+<p>The first invocation only queries capabilities, settings and battery; <code>--demo</code> takes control, lights green, yellow and red for one second each, gives one short beep, and then releases control. Light brightness and the buzzer are still limited by the settings stored on the device.</p>
+<h2 id="2-text-format-and-replies"><a class="anchor" href="#2-text-format-and-replies" aria-label="Link to this section">#</a>2. Text format and replies</h2>
+<p>A single command line is formatted like this:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=1 TOKEN=42 LED.SET R=0 Y=0 G=300</code></pre></div>
+<ul>
+<li>The line above must end with a newline <code>\n</code>; <code>\r</code>, <code>\r\n</code> and a semicolon <code>;</code> are also accepted.</li>
+<li><code>API1</code>, command names and parameter names are upper-case. Parameters are separated by spaces or tabs; JSON, quotes and Chinese characters are not used.</li>
+<li><code>ID</code> is required and ranges from 1 to 65535; you assign the number for each call. Parameter order does not matter.</li>
+<li>A line is at most 255 bytes, not counting the terminator; unknown parameters, repeated parameters and malformed numbers raise an error.</li>
+<li>Split and coalesced packets are supported. One receive does not have to equal one command; an over-long line is dropped in full, and its tail is not executed.</li>
+<li>Send one command, wait for the reply with the same <code>ID</code>, then send the next; the device queue holds up to 8 commands.</li>
+</ul>
+<p>Success and failure replies:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=1 OK
+API1 ID=1 ERR CODE=INVALID_ARGUMENT</code></pre></div>
+<p><code>INFO</code>, <code>STATUS</code> and <code>SOUND.LIST</code> may return extra data lines first, with the <code>OK</code> for the same <code>ID</code> last. The device also sends battery telemetry, replies from the older protocol and asynchronous events; sort them by prefix and <code>ID</code>.</p>
+<p><code>OK</code> means the device’s scheduled task has executed the command — it does not mean the scene has finished playing. A long scene reports completion through the <code>SCENE_DONE</code> event. When the queue is full, or an over-long line makes the request number impossible to extract reliably, the error is returned with <code>ID=0</code>.</p>
+<h2 id="3-control-sessions"><a class="anchor" href="#3-control-sessions" aria-label="Link to this section">#</a>3. Control sessions</h2>
+<p>Queries need no control ownership. Light, sound, scene and settings writes must open a session first:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=1 TOKEN=42 SESSION.OPEN LEASE_MS=30000</code></pre></div>
+<p><code>TOKEN</code> is chosen by you and ranges from 1 to 65535. It is a session number that keeps several control programs from taking the device from one another; it is not a password. <code>LEASE_MS</code> defaults to 30000 and ranges from 1000 to 600000.</p>
+<p>Later writes use the same <code>TOKEN</code>. A takeover request with a different <code>TOKEN</code> returns <code>BUSY</code>; opening again with the same <code>TOKEN</code> renews the lease.</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=2 TOKEN=42 SESSION.KEEPALIVE
+API1 ID=3 TOKEN=42 SESSION.CLOSE</code></pre></div>
+<p>A session write command that executes successfully renews the lease; ordinary queries do not. Send <code>KEEPALIVE</code> every 10 seconds, or use the example client, which renews automatically.</p>
+<p>While custom control is active, the old status/light/sound commands return <code>ERR API_BUSY</code>. Old queries and device preferences still work. The low-battery idle reminder does not override custom output.</p>
+<p>Session <code>CLOSE</code>, lease timeout, loss of the SPP/BLE data connection, USB disconnect, power-off or a mode switch stops custom output. After an explicit release or a detected disconnect, the device goes back to its existing connection-waiting/IDLE indication rules. When a USB application closes the port, CDC does not necessarily produce a reliable close event, so send <code>CLOSE</code> or the old <code>HOST_DISCONNECT</code> command; otherwise the session timeout catches it.</p>
+<p>While the device is powered off it accepts no API output control, and there is no way to power it on through the API.</p>
+<h2 id="4-query-commands"><a class="anchor" href="#4-query-commands" aria-label="Link to this section">#</a>4. Query commands</h2>
+<div class="table-wrap" data-reveal><table><tbody><tr><th>Command</th><th>Description</th></tr><tr><td><code>PING</code></td><td>API liveness check; replies <code>OK</code></td></tr><tr><td><code>INFO</code></td><td>API version, supported effects, 64-step limit, 255-byte line limit, queue and scheduler tick</td></tr><tr><td><code>STATUS</code></td><td>Power state, <code>OWNER</code>, scene <code>PLAYING</code>/<code>INDEX</code>/<code>COUNT</code>, remaining lease and current output</td></tr><tr><td><code>POWER.GET</code></td><td><code>CHG</code>, <code>VBAT</code>, <code>PER</code>, <code>CUR</code></td></tr><tr><td><code>SETTINGS.GET</code></td><td>Current master brightness, buzzer switch, master volume, low-battery reminder, firmware version</td></tr><tr><td><code>SOUND.LIST</code></td><td>All preset sound names in the current firmware; the last line is <code>OK END=1</code></td></tr><tr><td><code>BUTTON.GET</code></td><td>Physical button <code>PRESSED</code>, short-press <code>MODE</code>, <code>SUBSCRIBED</code> and <code>OWNER</code></td></tr></tbody></table></div>
+<p>Examples:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=10 INFO
+API1 ID=11 SETTINGS.GET
+API1 ID=12 POWER.GET</code></pre></div>
+<p><code>POWER.GET</code>: <code>VBAT</code> is in units of 0.01 V; <code>PER</code> is a percentage estimated from voltage; <code>CUR</code> is the target in mA from the charging configuration, not a reading from an external ammeter.</p>
+<p>In <code>STATUS</code>, <code>OUTPUT</code> <code>R</code>/<code>Y</code>/<code>G</code> are logical outputs from 0 to 300, before the master brightness and channel calibration are applied; <code>EFFECT</code> is 0 steady on, 1 blink, 2 breathe, 3 fade. <code>FREQ</code> indicates a direct API tone and preset melodies are not reported note by note. <code>PLAYING</code> only says whether a scene is playing.</p>
+<h2 id="5-basic-control-of-the-three-lights"><a class="anchor" href="#5-basic-control-of-the-three-lights" aria-label="Link to this section">#</a>5. Basic control of the three lights</h2>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=20 TOKEN=42 LED.SET R=300 Y=0 G=0
+API1 ID=21 TOKEN=42 LED.SET R=0 Y=150 G=300
+API1 ID=22 TOKEN=42 LED.SET R=0 Y=0 G=0</code></pre></div>
+<p><code>R</code>/<code>Y</code>/<code>G</code> are each 0 to 300 and default to 0 when omitted; one command sets all three channels in full, so omitted channels do not keep their previous values. Several of the individual lights can be on at once, but they cannot be blended into the colour of a single RGB light.</p>
+<p><code>DURATION_MS</code> is optional; 0 means hold until the next command or the end of the session, and a non-zero value ranges from 20 to 60000 and turns all three lights off when it expires:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=23 TOKEN=42 LED.SET G=300 DURATION_MS=1000</code></pre></div>
+<p>API channel levels are relative intensities; the master brightness and the existing channel calibration are still applied on top. Master brightness defaults to 30/300, about 10% of full output; at that setting <code>R=300</code> is roughly 10% PWM on the red light, and <code>R=150</code> about 5%. The green light’s existing 65% calibration still applies.</p>
+<p>The underlying PWM has 100 output steps, so after conversion some neighbouring levels of the logical 300-step scale come out identical; very low levels may round to 0. API1 changes neither the PWM timer frequency nor the hardware resolution.</p>
+<h2 id="6-parameterised-light-effects"><a class="anchor" href="#6-parameterised-light-effects" aria-label="Link to this section">#</a>6. Parameterised light effects</h2>
+<p>Use <code>LED.EFFECT</code>; <code>R</code>/<code>Y</code>/<code>G</code> work the same as in <code>LED.SET</code>:</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th><code>EFFECT</code></th><th>Parameters</th><th>Behaviour</th></tr><tr><td><code>SOLID</code></td><td><code>DURATION_MS</code> optional</td><td>Steady on, the same as <code>LED.SET</code></td></tr><tr><td><code>BLINK</code></td><td><code>ON_MS</code>, <code>OFF_MS</code>, each defaulting to 500, range 20–60000</td><td>Alternates on and off, with custom on and off durations</td></tr><tr><td><code>BREATHE</code></td><td><code>PERIOD_MS</code> defaults to 2000, range 40–60000</td><td>Triangular brightness curve: dim → bright → dim</td></tr><tr><td><code>FADE</code></td><td><code>DURATION_MS</code> required, 20–60000</td><td>Fades from the currently displayed value to the target and holds the target when it finishes</td></tr></tbody></table></div>
+<p>For <code>BLINK</code>/<code>BREATHE</code>/<code>SOLID</code>, a <code>DURATION_MS</code> of 0 runs continuously and a non-zero value turns the lights off when it expires; for <code>FADE</code>, <code>DURATION_MS</code> is the transition time.</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=30 TOKEN=42 LED.EFFECT EFFECT=BLINK R=300 ON_MS=200 OFF_MS=800
+API1 ID=31 TOKEN=42 LED.EFFECT EFFECT=BREATHE G=300 PERIOD_MS=3000
+API1 ID=32 TOKEN=42 LED.EFFECT EFFECT=FADE Y=300 DURATION_MS=1000</code></pre></div>
+<p>LED commands do not cancel a buzzer that is playing on its own. If a combined light-and-sound scene is playing, however, a new LED or buzzer control command cancels the whole scene, so that two sets of execution logic do not contend for the same peripherals.</p>
+<h2 id="7-buzzer"><a class="anchor" href="#7-buzzer" aria-label="Link to this section">#</a>7. Buzzer</h2>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=40 TOKEN=42 BUZZER.TONE FREQ=2700 VOLUME=50 DURATION_MS=200
+API1 ID=41 TOKEN=42 BUZZER.STOP
+API1 ID=42 TOKEN=42 SOUND.PLAY NAME=CLASSIC LOOP=0</code></pre></div>
+<ul>
+<li><code>FREQ</code> is required for <code>TONE</code>: 0 is silent, and non-zero values range from 95 to 10000 Hz. 2700 Hz suits the current buzzer; actual loudness varies with frequency.</li>
+<li><code>VOLUME</code> defaults to 100 and ranges from 0 to 100, as a proportion of the master volume; <code>DURATION_MS</code> defaults to 200 and ranges from 20 to 60000.</li>
+<li>The device’s master volume defaults to 10; a relative value of 50, for example, means using half the master volume. The master switch off, a master volume of 0, or a relative volume of 0 all mean silence.</li>
+<li>For a direct API tone, when both the master volume and the relative volume are 100, the PWM duty cycle is capped at 50%. Volume percentages are neither decibels nor linear sound pressure.</li>
+<li>For a preset <code>SOUND</code>, <code>LOOP</code> defaults to 0 and 1 means loop, still bounded by the session lease. Preset sounds use the existing volume and tempo logic.</li>
+<li><code>BUZZER.STOP</code> cancels a combined scene that is running; when it stops a standalone sound, standalone light effects are kept.</li>
+</ul>
+<p>The current preset names are available through <code>SOUND.LIST</code>, including <code>CLASSIC</code>, <code>UP</code>, <code>DOWN</code>, <code>OK</code>, <code>ALERT</code>, <code>SOFT</code>, <code>CHIME</code>, <code>POP</code>, <code>DONE</code>, and melodies such as <code>MELODY_RISE</code> and <code>MELODY_HAPPY</code>. Do not rely on a hard-coded list — your program should query it first.</p>
+<h2 id="8-custom-scenes-upload-then-the-device-plays-them-automatically"><a class="anchor" href="#8-custom-scenes-upload-then-the-device-plays-them-automatically" aria-label="Link to this section">#</a>8. Custom scenes: upload, then the device plays them automatically</h2>
+<p>A scene has at most 64 steps, and each step fully specifies the three lights, the light effect, the sound and the duration. Lights and sounds not set in a step default to off.</p>
+<p>The flow is BEGIN → STEP (once per step) → COMMIT → PLAY. Wait for the ACK of each command before sending the next.</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=50 TOKEN=42 SCENE.BEGIN COUNT=4
+API1 ID=51 TOKEN=42 SCENE.STEP INDEX=0 G=300 DURATION_MS=1000
+API1 ID=52 TOKEN=42 SCENE.STEP INDEX=1 Y=300 DURATION_MS=1000
+API1 ID=53 TOKEN=42 SCENE.STEP INDEX=2 R=300 DURATION_MS=1000
+API1 ID=54 TOKEN=42 SCENE.STEP INDEX=3 FREQ=2700 VOLUME=50 DURATION_MS=200
+API1 ID=55 TOKEN=42 SCENE.COMMIT
+API1 ID=56 TOKEN=42 SCENE.PLAY REPEAT=1</code></pre></div>
+<ul>
+<li><code>COUNT</code> is 1 to 64; <code>INDEX</code> starts at 0.</li>
+<li><code>STEP</code> accepts <code>R</code>/<code>Y</code>/<code>G</code>, <code>EFFECT</code>, <code>ON_MS</code>, <code>OFF_MS</code>, <code>PERIOD_MS</code>, <code>FREQ</code> and <code>VOLUME</code>, with the same meanings as above. <code>DURATION_MS</code> is required on every step, 20 to 60000.</li>
+<li>The same <code>INDEX</code> can be re-sent to overwrite it; <code>COMMIT</code> is only possible once every <code>INDEX</code> is present. Invalid parameters do not modify steps already received.</li>
+<li><code>BEGIN</code> and <code>STEP</code> go into a pending buffer and nothing plays while you upload. The scene is only replaced after <code>COMMIT</code> has validated everything.</li>
+<li>You can upload the next scene while one is playing, but <code>COMMIT</code> returns <code>SCENE_RUNNING</code>; send <code>CANCEL</code> first, or wait for the current playback to finish.</li>
+<li><code>REPEAT</code> defaults to 1 and ranges from 0 to 1000; 0 loops indefinitely and needs the lease to be renewed.</li>
+<li>When a finite playback finishes, the three lights and any direct tone are turned off, and the session still belongs to you so that the next operation can be sent. Use <code>SESSION.CLOSE</code> to restore the connection/IDLE indication.</li>
+<li>Scenes are kept in RAM; closing the session, switching modes or restarting loses them, and they have to be uploaded again.</li>
+<li>The execution tick is about 20 ms, suited to status lights and notification sounds, not to microsecond-level timing.</li>
+</ul>
+<p>Start/completion/cancellation events:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 EVENT=SCENE_STARTED TOKEN=42 PLAY_ID=56
+API1 EVENT=SCENE_DONE TOKEN=42 PLAY_ID=56
+API1 EVENT=SCENE_CANCELLED TOKEN=42 PLAY_ID=56</code></pre></div>
+<p><code>PLAY_ID</code> is the request <code>ID</code> that started that playback; use it to tell different playbacks in the same session apart.</p>
+<p>Alternating blink: upload two steps, red on and yellow on, then set <code>REPEAT=0</code>. Custom melody: upload <code>FREQ</code>/<code>VOLUME</code>/<code>DURATION_MS</code> for each note, using <code>FREQ=0</code> for a rest step. Light and sound in sync: set the light parameters and <code>FREQ</code> in the same step.</p>
+<h2 id="9-stopping-and-device-configuration"><a class="anchor" href="#9-stopping-and-device-configuration" aria-label="Link to this section">#</a>9. Stopping and device configuration</h2>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=60 TOKEN=42 SCENE.CANCEL
+API1 ID=61 TOKEN=42 OUTPUT.STOP
+API1 ID=62 TOKEN=42 SETTINGS.SET BRIGHTNESS=30 BUZZER=1 VOLUME=10 LOW_BATTERY_ALERT=1 SAVE=1</code></pre></div>
+<p><code>SCENE.CANCEL</code> stops the current scene and turns its output off; with no scene it leaves standalone lights and sounds alone. <code>OUTPUT.STOP</code> stops all custom lights and sounds, keeping the session and the committed scene.</p>
+<p><code>SETTINGS.SET</code> accepts:</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>Parameter</th><th>Range</th><th>Description</th></tr><tr><td><code>BRIGHTNESS</code></td><td>0–300</td><td>Master brightness, default 30</td></tr><tr><td><code>BUZZER</code></td><td>0/1</td><td>Master buzzer switch</td></tr><tr><td><code>VOLUME</code></td><td>0–100</td><td>Master volume, default 10</td></tr><tr><td><code>LOW_BATTERY_ALERT</code></td><td>0/1</td><td>Low-battery idle reminder</td></tr><tr><td><code>SAVE</code></td><td>0/1, default 0</td><td>0 changes only the running value; 1 saves the device settings after a delay of about 1 second</td></tr></tbody></table></div>
+<p>Omitted settings keep their current values. <code>SAVE=1</code> can also be sent on its own to save the whole current configuration. A save uses the snapshot taken when the request was made; wait until you see the legacy-format <code>SETTINGS:...STORE:VM</code> receipt before cutting power. Several saves in quick succession are merged into the last request.</p>
+<p>Temporary settings are not restored automatically by <code>SESSION.CLOSE</code>; after a power cycle the device restores them from device storage. Scenes and individual playbacks are not written to flash.</p>
+<h2 id="10-python-client-example"><a class="anchor" href="#10-python-client-example" aria-label="Link to this section">#</a>10. Python client example</h2>
+<p>Put the downloaded <code>agentcore_api.py</code> in the same directory as your script:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>from agentcore_api import AgentCoreAPI
+
+with AgentCoreAPI(&quot;COM49&quot;) as api:
+    print(api.request(&quot;INFO&quot;))
+    api.acquire()  # renewed automatically
+    api.effect(&quot;BREATHE&quot;, green=300, PERIOD_MS=2000)
+    api.tone(frequency=2700, volume=50, duration_ms=200)
+
+    api.play_scene([
+        {&quot;G&quot;: 300, &quot;DURATION_MS&quot;: 1000},
+        {&quot;Y&quot;: 300, &quot;DURATION_MS&quot;: 1000},
+        {&quot;R&quot;: 300, &quot;FREQ&quot;: 2700, &quot;VOLUME&quot;: 50, &quot;DURATION_MS&quot;: 200},
+    ], repeat=1)
+    print(api.wait_scene(timeout=10))
+    # leaving the with block releases the session and closes the port</code></pre></div>
+<p>In your own agent or application code, simply call <code>api.led</code>, <code>api.effect</code> or <code>api.play_scene</code> when an event occurs. The list returned by a query contains every API data line for that request; device errors raise <code>APIError</code>.</p>
+<p>This delivery implements the firmware protocol and the Python serial client. The existing software’s HTTP <code>/command</code> uses a single-slot pending-send path, so it cannot guarantee that all the commands of a multi-command scene upload are kept, and it does not wait for the full API1 receipt; do not upload scenes through rapid successive HTTP POSTs for now. A new HTTP SDK / web developer entry point needs separate work later — do not treat the text protocol here as an HTTP route that has already been added.</p>
+<h2 id="11-error-codes"><a class="anchor" href="#11-error-codes" aria-label="Link to this section">#</a>11. Error codes</h2>
+<div class="table-wrap" data-reveal><table><tbody><tr><th>Error</th><th>Meaning and handling</th></tr><tr><td><code>BAD_REQUEST</code></td><td><code>ID</code>, number format, duplicate fields or command format incorrect</td></tr><tr><td><code>UNKNOWN_COMMAND</code> / <code>UNKNOWN_PARAMETER</code></td><td>Wrong command or parameter name</td></tr><tr><td><code>INVALID_ARGUMENT</code></td><td>Missing parameter, out of range, invalid effect/sound name</td></tr><tr><td><code>DEVICE_OFF</code> / <code>NO_LINK</code></td><td>Device not powered on, or the data link is not established</td></tr><tr><td><code>BUSY</code> / <code>NOT_OWNER</code> / <code>NO_SESSION</code></td><td>Control-session conflict, <code>TOKEN</code> mismatch, or no <code>OPEN</code> yet</td></tr><tr><td><code>LINE_TOO_LONG</code> / <code>QUEUE_FULL</code></td><td>Command too long or sent too fast; adjust how you send</td></tr><tr><td><code>NO_UPLOAD</code> / <code>INCOMPLETE_SCENE</code></td><td>No <code>BEGIN</code> yet, or not all steps uploaded</td></tr><tr><td><code>NO_SCENE</code> / <code>SCENE_RUNNING</code></td><td>No committed scene, or <code>COMMIT</code> while something is playing</td></tr></tbody></table></div>
+<p>A session-release event may be sent with <code>REASON=CLIENT</code>, <code>TIMEOUT</code>, <code>LINK_LOST</code> or <code>DEVICE_OFF</code>. Power-off or a mode switch resets the API outright; a channel that has been disconnected is not guaranteed to receive the release event.</p>
+<h2 id="12-on-device-acceptance-testing"><a class="anchor" href="#12-on-device-acceptance-testing" aria-label="Link to this section">#</a>12. On-device acceptance testing</h2>
+<ol>
+<li>Confirm that the old <code>IDLE</code>/<code>BUSY</code>/<code>DONE</code>/<code>ERROR</code> states, button power on/off and mode switching still work.</li>
+<li>Run the Python <code>--demo</code> and confirm that green, yellow and red each light for one second, then a short beep sounds, and the connection state is restored.</li>
+<li>Verify <code>BLINK</code>, <code>BREATHE</code> and <code>FADE</code>, plus scene looping and rests between notes.</li>
+<li>Call the short beep 100 times in a row and check that it never stops working; with the master switch OFF or the master volume at 0 there should be complete silence.</li>
+<li>While playing, unplug the cable or drop the SPP connection, or stop renewing the lease, and check that output stops and the waiting/IDLE indication returns.</li>
+<li>After sending <code>SAVE=1</code>, wait for the save receipt before restarting, and confirm the settings come back; a <code>SAVE=0</code> change should not become part of the next boot configuration.</li>
+<li>Set <code>IDLE_SLEEP_SEC</code> to 60 and, after one minute idle, confirm that all lights are off, the connection is still up and a status command brings the lights back automatically; set <code>BT_DISCONNECT_OFF_SEC</code> to 60, drop the Bluetooth data connection for one minute and confirm that the device powers itself off.</li>
+</ol>
+<h2 id="13-upgrade-notes"><a class="anchor" href="#13-upgrade-notes" aria-label="Link to this section">#</a>13. Upgrade notes</h2>
+<p>This firmware version enlarges the application area, and the configuration storage layout differs from older versions.</p>
+<p>Before upgrading, read and record the master brightness, buzzer switch, master volume and low-battery reminder settings with the old software; after upgrading, check those settings and the Bluetooth pairing again, and restore the settings and re-pair if necessary.</p>
+<p><code>SAVE=1</code> can save settings to the device, but old data is not guaranteed to carry over automatically across different configuration layouts — record any settings you need to keep before upgrading.</p>
+<p>From v0.5.3 onwards, the firmware migrates the settings from the old layout automatically during an upgrade (master brightness, buzzer switch, master volume, low-battery reminder), so these no longer have to be set by hand afterwards; it is still worth checking them after the upgrade, and confirming against section 15 that the defaults of the two sleep times are what you expect.</p>
+<h2 id="14-button-queries-subscription-and-short-press-takeover-added-in-v0-5-1"><a class="anchor" href="#14-button-queries-subscription-and-short-press-takeover-added-in-v0-5-1" aria-label="Link to this section">#</a>14. Button queries, subscription and short-press takeover (added in v0.5.1)</h2>
+<p>The device has only one physical button (currently <code>PB6</code> in the board configuration, active low). The API’s button control only affects short presses after power-on; it cannot disable long-press power-off, and the API cannot power the device on. The existing 50 ms scan and roughly 3-second long-press power on/off logic are unchanged.</p>
+<h3 id="14-1-default-mode-and-takeover-mode"><a class="anchor" href="#14-1-default-mode-and-takeover-mode" aria-label="Link to this section">#</a>14.1 Default mode and takeover mode</h3>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>Mode</th><th>Short press after power-on</th><th>Long press of about 3 seconds</th></tr><tr><td><code>DEFAULT</code> (default)</td><td>Switches between Bluetooth and USB serial mode</td><td>Keeps the original power on/off behaviour</td></tr><tr><td><code>APPLICATION</code> (API takeover)</td><td>Does not switch transport mode; after subscription it reports <code>CLICK</code>, and your program decides what it is used for</td><td>Keeps the original power-off behaviour; the API cannot disable it</td></tr></tbody></table></div>
+<ul>
+<li>The device is in <code>DEFAULT</code> with no subscription each time it starts and when a new API session is established. <code>SESSION.OPEN</code> on its own does not take over the button.</li>
+<li>Opening an existing session again with the same <code>TOKEN</code> only renews the lease; it does not reset the selected button mode or subscription. Only a session established again after release returns to the default.</li>
+<li><code>APPLICATION</code> belongs only to the current control session and is not written to flash/VM. <code>SESSION.CLOSE</code>, lease timeout, loss of the data connection, power-off and a transport-mode switch all restore <code>DEFAULT</code> and cancel the subscription; the next connection has to <code>OPEN</code>, <code>SUBSCRIBE</code> and set <code>MODE</code> again.</li>
+<li>Recovery from a disconnect follows the device actually detecting that the link went down. Closing a USB COM port may produce no reliable disconnect event, so send <code>CLOSE</code> on a normal exit; after an abnormal exit the lease timeout catches it, and an immediate recovery after closing the port is not guaranteed.</li>
+<li>Whether the button is taken over and whether it is subscribed are independent of each other: <code>ENABLE=0</code> only stops reporting, it does not restore the mode. While in <code>APPLICATION</code>, a short press still does not switch modes even with no subscription. To restore physical mode switching, send <code>MODE=DEFAULT</code> or close the session.</li>
+<li>A short press does not renew the lease; <code>SESSION.KEEPALIVE</code> is still needed. The Python client’s <code>acquire()</code> starts automatic renewal.</li>
+</ul>
+<h3 id="14-2-commands-and-responses"><a class="anchor" href="#14-2-commands-and-responses" aria-label="Link to this section">#</a>14.2 Commands and responses</h3>
+<p>Query (no session needed, does not renew the lease):</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=100 BUTTON.GET
+API1 ID=100 OK PRESSED=0 MODE=DEFAULT SUBSCRIBED=0 OWNER=0</code></pre></div>
+<p><code>PRESSED=1</code> means the scan sees the button held down and 0 means released, with an update granularity of about 50 ms; it is not an interrupt-level instant reading. <code>MODE</code> is what a short press does, <code>SUBSCRIBED</code> says whether the current session is subscribed, and <code>OWNER</code> is the session <code>TOKEN</code> or 0.</p>
+<p>Take a control session first, then subscribe and switch to takeover mode. Wait for the <code>OK</code> with the matching <code>ID</code> after each command before sending the next:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=101 TOKEN=42 SESSION.OPEN LEASE_MS=30000
+API1 ID=102 TOKEN=42 BUTTON.SUBSCRIBE ENABLE=1
+API1 ID=103 TOKEN=42 BUTTON.MODE MODE=APPLICATION</code></pre></div>
+<p><code>ENABLE</code> is required for <code>BUTTON.SUBSCRIBE</code> and is 0 or 1; <code>MODE</code> is required for <code>BUTTON.MODE</code> and accepts only the upper-case values <code>DEFAULT</code> and <code>APPLICATION</code>. Both must use the current session <code>TOKEN</code>; on success the device replies <code>OK</code> under the matching <code>ID</code> and renews the lease. Invalid parameters return <code>INVALID_ARGUMENT</code>; no session or a <code>TOKEN</code> that does not match return <code>NO_SESSION</code> / <code>NOT_OWNER</code> respectively.</p>
+<p>After a valid short press is released, the device reports on its own:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 EVENT=BUTTON TOKEN=42 ACTION=CLICK SEQ=1 HELD_MS=150 MODE=APPLICATION</code></pre></div>
+<ul>
+<li><code>TOKEN</code> is what you filter events from your own session by; this line has no request <code>ID</code> — it is an unsolicited event, not a command receipt.</li>
+<li>Only <code>CLICK</code> is provided today; there is no <code>DOWN</code>, <code>UP</code>, double-click or <code>LONG_PRESS</code>. A long press that powers the device off does not also produce a <code>CLICK</code>.</li>
+<li><code>HELD_MS</code> is the hold time accumulated by the firmware’s scan, in ms; its accuracy is affected by the 50 ms scan.</li>
+<li><code>SEQ</code> is the short-press sequence number for this run; it starts again after a restart and the 32-bit counter can wrap. It can also increment while you are not subscribed and is not required to be contiguous; do not treat it as a permanent identifier across restarts.</li>
+<li>You can subscribe to <code>CLICK</code> in <code>DEFAULT</code> too, but the short press then switches transport mode and drops the current link, so the event may not arrive. When the short press has to drive your own application logic reliably, use <code>APPLICATION</code>.</li>
+<li>Power-off and disconnects do not guarantee that the last event arrives. Your program must handle serial-port closure, connection errors and session timeouts; do not rely on button events alone to tell whether the device is powered off.</li>
+</ul>
+<p>Restoring the default button use explicitly (both commands can be run in the current session):</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>API1 ID=104 TOKEN=42 BUTTON.MODE MODE=DEFAULT
+API1 ID=105 TOKEN=42 BUTTON.SUBSCRIBE ENABLE=0</code></pre></div>
+<p>This does not leave the LED/buzzer API session. If you also want the device’s original connection/IDLE light effects back, send <code>SESSION.CLOSE</code> afterwards.</p>
+<h3 id="14-3-python-example"><a class="anchor" href="#14-3-python-example" aria-label="Link to this section">#</a>14.3 Python example</h3>
+<p>Close the desktop service that holds the COM port, then run:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">powershell</span><button class="copy-btn" type="button">Copy</button></div><pre><code>py -3 agentcore_api.py --port COM49 --button-demo</code></pre></div>
+<p>The script takes over short presses and waits up to 30 seconds. A short press then prints the event and lights the green light for one second, after which the script restores <code>DEFAULT</code>, unsubscribes and releases the session; a long press still powers the device off, which may make the example report a connection error or timeout — that is not a short-press event. Replace COM49 with the actual USB CDC or Bluetooth outgoing port.</p>
+<p>For your own application code:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">python</span><button class="copy-btn" type="button">Copy</button></div><pre><code>import time
+from agentcore_api import AgentCoreAPI
+
+with AgentCoreAPI(&quot;COM49&quot;) as api:
+    api.acquire()
+    api.button_subscribe(True)
+    api.button_mode(&quot;APPLICATION&quot;)
+    print(api.button_get())
+    print(&quot;Short-press the device button&quot;)
+    event = api.wait_button(timeout=30)
+    print(event)
+    api.tone(frequency=2700, volume=50, duration_ms=200)
+    api.led(green=300, duration_ms=1000)
+    time.sleep(1)  # hold the session until the output is done, or leaving the with block stops the light and buzzer at once
+    # carry on with your own logic here; leaving the with block releases the session and restores the default button mode.</code></pre></div>
+<p><code>wait_button()</code> and <code>wait_scene()</code> consume the same event queue, so do not run them at the same time or let several threads fight over events. When you need to handle scenes, button events and so on together, read <code>api.events</code> in one place and dispatch by <code>EVENT</code> in a single application thread. The <code>on_event</code> callback runs on the serial reader thread and must not call reply-waiting methods such as <code>api.request()</code>/<code>led()</code>/<code>tone()</code> directly, or it blocks the reader; hand events to your application thread through your own thread-safe queue instead.</p>
+<h3 id="14-4-on-device-testing"><a class="anchor" href="#14-4-on-device-testing" aria-label="Link to this section">#</a>14.4 On-device testing</h3>
+<ol>
+<li>With no API session running, a short press should switch between Bluetooth and serial as usual, and a long press of about 3 seconds should still power the device off.</li>
+<li>With only <code>OPEN</code> sent and no <code>BUTTON.MODE</code>, a short press still switches modes.</li>
+<li>Run <code>--button-demo</code>: a short press delivers a <code>CLICK</code> and the transport does not switch.</li>
+<li>In <code>APPLICATION</code>, press repeatedly and check that one release produces exactly one <code>CLICK</code>; a long press to power off produces no <code>CLICK</code>.</li>
+<li>Set <code>ENABLE=0</code>: short presses are no longer reported, but the device is still in <code>APPLICATION</code>; after setting <code>MODE=DEFAULT</code>, short presses switch modes again.</li>
+<li>Close the session, unplug USB or drop the SPP connection, or stop renewing the lease: the next short press goes back to the default behaviour. When a session is established again, <code>GET</code> should show <code>DEFAULT</code> and <code>SUBSCRIBED=0</code>.</li>
+<li>Set the takeover and then restart: check that the device is still in <code>DEFAULT</code> — the takeover mode is not saved to the device.</li>
+</ol>
+<h2 id="15-standby-sleep-and-auto-power-off-added-in-v0-5-3"><a class="anchor" href="#15-standby-sleep-and-auto-power-off-added-in-v0-5-3" aria-label="Link to this section">#</a>15. Standby sleep and auto power-off (added in v0.5.3)</h2>
+<p>The device has two power-saving actions, and the timing of both can be changed:</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>Setting</th><th>Default</th><th>Description</th></tr><tr><td><code>IDLE_SLEEP_SEC</code></td><td>600 seconds</td><td>After this much continuous idle time, all status lights go out and the device enters sleep. The connection stays up, and a new status command wakes it automatically</td></tr><tr><td><code>BT_DISCONNECT_OFF_SEC</code></td><td>300 seconds</td><td>Bluetooth mode only: after this much time with no data connection, the device powers itself off. It powers off even while USB charging is plugged in</td></tr></tbody></table></div>
+<p>Both range from 0 to 3600 seconds, and <strong>0 disables</strong> the matching automatic action; a setting is written to device storage after about 1 second and stays in effect after being powered on again.</p>
+<p>These two settings have no matching API1 command; use the legacy-format text commands (the same channel as settings such as <code>BRIGHTNESS</code>, with no <code>API1</code> prefix, and a <code>\n</code> terminator just like the rest):</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>IDLE_SLEEP_SEC:600
+BT_DISCONNECT_OFF_SEC:300</code></pre></div>
+<ul>
+<li>The value must be a plain number; above 3600 the device replies <code>ERR IDLE_SLEEP_SEC</code> / <code>ERR BT_DISCONNECT_OFF_SEC</code>, and on success it returns one line, <code>SLEEP_SETTINGS:...</code>.</li>
+<li><strong>While a session is open</strong>, the device only lets queries and a subset of the settings commands through, and these two are answered with <code>ERR API_BUSY</code>; to change them, send <code>SESSION.CLOSE</code> first, or use a channel with no session open.</li>
+<li>Query with <code>GET_SETTINGS</code> (also available while a session is open); the device returns one extra line:</li>
+</ul>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>SLEEP_SETTINGS:IDLE_SLEEP_SEC:600,BT_DISCONNECT_OFF_SEC:300,SLEEP:OFF,STORE:VM</code></pre></div>
+<p><code>SLEEP:ON</code> means the device is currently in lights-off sleep.</p>
+<p>While asleep, all lights are off, and the Bluetooth/serial connection and button scanning stay active; after a new status command (<code>IDLE</code>, <code>BUSY</code> and so on) the light effects come back immediately. The idle-state green light is a low-brightness breathing effect; setting <code>IDLE_SLEEP_SEC</code> to 0 turns the automatic lights-off off, and the idle state then keeps breathing instead of going completely dark.</p>
+<div class="callout callout-note" data-reveal><p>The device does not enter sleep while an API session is open; once the session is released, the idle timing starts again. Sleep is managed by the firmware’s state machine, and custom API light effects are unaffected.</p></div>
+      </article>
+    </div>
+  </main>
+
+  <button class="to-top" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>AgentCore-Light · User Manual</span>
+      <span class="footer-shop">Official store: <a href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener">AgentCore-Light on Taobao ↗</a></span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+  </script>
+  <script src="../site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentCore-Light Linux User Manual</title>
+  <meta name="description" content="Launch the app, set serial permissions and connect the device">
+  <meta name="theme-color" content="#f3f6f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1517" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="canonical" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/linux.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/linux.html">
+  <link rel="alternate" hreflang="en" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/linux.html">
+  <link rel="alternate" hreflang="x-default" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/linux.html">
+  <link rel="stylesheet" href="../style.css">
+  <script>
+    // 尽早套用上次选择的主题，避免刷新时闪白
+    try {
+      var savedTheme = localStorage.getItem('agentcore-manual-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (error) {}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header site-header--dense">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>AgentCore-Light<small>User Manual</small></span>
+      </a>
+      <div class="header-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <nav class="header-nav" aria-label="Manual navigation">
+        <a class="tab" href="windows.html">Windows</a>
+        <a class="tab" href="macos.html">macOS</a>
+        <a class="tab active" href="linux.html" aria-current="page">Linux</a>
+        <a class="tab" href="api.html">API Manual</a>
+        <a class="tab tab-shop" href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener" title="Official store · Support and accessories">Official store</a>
+        <a class="tab tab-lang" href="../linux.html" hreflang="zh-CN" lang="zh" title="切换到中文" data-lang="zh">中文</a>
+        <button class="icon-btn" id="printBtn" type="button" aria-label="Print or save as PDF" title="Print / Save as PDF">🖨️</button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch light / dark theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap layout" id="content">
+    <aside class="toc-side">
+      <nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol><li class="lvl-2"><a href="#download-panel">Download the app</a></li><li class="lvl-2"><a href="#1-status-at-a-glance">1. Status at a glance</a></li><li class="lvl-2"><a href="#2-installing-and-starting-the-linux-app">2. Installing and starting the Linux app</a><ol><li class="lvl-3"><a href="#2-1-installation-steps">2.1 Installation steps</a></li><li class="lvl-3"><a href="#2-2-what-to-do-when-your-browser-or-security-software-says-not-safe">2.2 What to do when your browser or security software says “not safe”</a></li></ol></li><li class="lvl-2"><a href="#3-setting-permissions-before-your-first-usb-connection">3. Setting permissions before your first USB connection</a></li><li class="lvl-2"><a href="#4-powering-on-powering-off-and-switching-modes">4. Powering on, powering off and switching modes</a><ol><li class="lvl-3"><a href="#powering-on-and-off">Powering on and off</a></li><li class="lvl-3"><a href="#switching-connection-modes">Switching connection modes</a></li></ol></li><li class="lvl-2"><a href="#5-connecting-over-bluetooth">5. Connecting over Bluetooth</a></li><li class="lvl-2"><a href="#6-connecting-over-usb-serial">6. Connecting over USB serial</a></li><li class="lvl-2"><a href="#7-the-console-and-your-ai-tools">7. The console and your AI tools</a><ol><li class="lvl-3"><a href="#status-light-reference">Status light reference</a></li></ol></li><li class="lvl-2"><a href="#8-setting-up-start-at-sign-in-optional">8. Setting up start at sign-in (optional)</a></li><li class="lvl-2"><a href="#9-standby-sleep-and-auto-power-off">9. Standby, sleep and auto power-off</a><ol><li class="lvl-3"><a href="#9-1-the-idle-breathing-light">9.1 The idle breathing light</a></li><li class="lvl-3"><a href="#9-2-going-to-sleep-after-a-while-idle">9.2 Going to sleep after a while idle</a></li><li class="lvl-3"><a href="#9-3-auto-power-off-when-bluetooth-drops">9.3 Auto power-off when Bluetooth drops</a></li><li class="lvl-3"><a href="#9-4-charging-and-battery-life">9.4 Charging and battery life</a></li></ol></li><li class="lvl-2"><a href="#10-troubleshooting">10. Troubleshooting</a><ol><li class="lvl-3"><a href="#the-app-will-not-start">The app will not start</a></li><li class="lvl-3"><a href="#usb-connection-fails-or-says-permission-denied">USB connection fails, or says permission denied</a></li><li class="lvl-3"><a href="#bluetooth-mode-keeps-blinking-red">Bluetooth mode keeps blinking red</a></li><li class="lvl-3"><a href="#the-light-does-not-change">The light does not change</a></li><li class="lvl-3"><a href="#there-is-dust-or-a-fingerprint-on-the-shell-has-it-been-used">There is dust or a fingerprint on the shell — has it been used?</a></li><li class="lvl-3"><a href="#after-a-while-idle-the-light-goes-out-by-itself">After a while idle the light goes out by itself</a></li><li class="lvl-3"><a href="#the-device-powered-itself-off">The device powered itself off</a></li></ol></li><li class="lvl-2"><a href="#11-precautions">11. Precautions</a></li></ol></nav>
+    </aside>
+
+    <div>
+      <details class="toc-mobile">
+        <summary>On this page</summary>
+        <nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol><li class="lvl-2"><a href="#download-panel">Download the app</a></li><li class="lvl-2"><a href="#1-status-at-a-glance">1. Status at a glance</a></li><li class="lvl-2"><a href="#2-installing-and-starting-the-linux-app">2. Installing and starting the Linux app</a><ol><li class="lvl-3"><a href="#2-1-installation-steps">2.1 Installation steps</a></li><li class="lvl-3"><a href="#2-2-what-to-do-when-your-browser-or-security-software-says-not-safe">2.2 What to do when your browser or security software says “not safe”</a></li></ol></li><li class="lvl-2"><a href="#3-setting-permissions-before-your-first-usb-connection">3. Setting permissions before your first USB connection</a></li><li class="lvl-2"><a href="#4-powering-on-powering-off-and-switching-modes">4. Powering on, powering off and switching modes</a><ol><li class="lvl-3"><a href="#powering-on-and-off">Powering on and off</a></li><li class="lvl-3"><a href="#switching-connection-modes">Switching connection modes</a></li></ol></li><li class="lvl-2"><a href="#5-connecting-over-bluetooth">5. Connecting over Bluetooth</a></li><li class="lvl-2"><a href="#6-connecting-over-usb-serial">6. Connecting over USB serial</a></li><li class="lvl-2"><a href="#7-the-console-and-your-ai-tools">7. The console and your AI tools</a><ol><li class="lvl-3"><a href="#status-light-reference">Status light reference</a></li></ol></li><li class="lvl-2"><a href="#8-setting-up-start-at-sign-in-optional">8. Setting up start at sign-in (optional)</a></li><li class="lvl-2"><a href="#9-standby-sleep-and-auto-power-off">9. Standby, sleep and auto power-off</a><ol><li class="lvl-3"><a href="#9-1-the-idle-breathing-light">9.1 The idle breathing light</a></li><li class="lvl-3"><a href="#9-2-going-to-sleep-after-a-while-idle">9.2 Going to sleep after a while idle</a></li><li class="lvl-3"><a href="#9-3-auto-power-off-when-bluetooth-drops">9.3 Auto power-off when Bluetooth drops</a></li><li class="lvl-3"><a href="#9-4-charging-and-battery-life">9.4 Charging and battery life</a></li></ol></li><li class="lvl-2"><a href="#10-troubleshooting">10. Troubleshooting</a><ol><li class="lvl-3"><a href="#the-app-will-not-start">The app will not start</a></li><li class="lvl-3"><a href="#usb-connection-fails-or-says-permission-denied">USB connection fails, or says permission denied</a></li><li class="lvl-3"><a href="#bluetooth-mode-keeps-blinking-red">Bluetooth mode keeps blinking red</a></li><li class="lvl-3"><a href="#the-light-does-not-change">The light does not change</a></li><li class="lvl-3"><a href="#there-is-dust-or-a-fingerprint-on-the-shell-has-it-been-used">There is dust or a fingerprint on the shell — has it been used?</a></li><li class="lvl-3"><a href="#after-a-while-idle-the-light-goes-out-by-itself">After a while idle the light goes out by itself</a></li><li class="lvl-3"><a href="#the-device-powered-itself-off">The device powered itself off</a></li></ol></li><li class="lvl-2"><a href="#11-precautions">11. Precautions</a></li></ol></nav>
+      </details>
+      <article class="guide-content">
+<h1 id="agentcore-light-user-manual">AgentCore-Light User Manual</h1>
+<section class="download-panel" id="download-panel" data-reveal><div class="download-panel-copy"><span class="download-panel-kicker">Step 1 · Download the app</span><h2>Download the Linux app</h2><p>For x86_64 Linux. Unzip, then run <code>chmod +x AgentCore-Light</code>.</p></div><div class="download-panel-actions"><div class="download-item"><a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light-linux.tar.gz" download>Download for Linux <span>↓</span></a><p class="download-version">Version v2.1.2</p></div></div></section>
+<aside class="download-note" data-reveal><p class="download-note-title">Blocked by your system the first time?</p><p class="download-note-intro">The app is not in any distribution’s repository and carries no repository signature, so a “not safe” warning while downloading is normal — <strong>it is not a virus</strong>.</p><ul><li><strong>Your browser says “this file isn’t commonly downloaded”</strong> → Choose “Keep” in the download list</li><li><strong>The archive was deleted automatically</strong> → Pick “Restore” / “Keep” in your download history or security software, then unzip again</li><li><strong>Your security software warns</strong> → Add <code>AgentCore-Light</code> to its trusted / allow list</li></ul><a class="download-note-more" href="#2-2-what-to-do-when-your-browser-or-security-software-says-not-safe">Read the details → 2.2 What to do when your browser or security software says “not safe”</a></aside>
+<div class="meta" data-reveal><p>Applies to product: AgentCore-Light desktop status light</p><p>Applies to software: AgentCore-Light Linux app</p></div>
+<div class="callout callout-important" data-reveal><p><strong>The magnetic plate, and returns</strong></p><p>A magnetic plate is included so you can mount the device wherever it suits you. Please power it on and test everything first — power, connection, lights, buzzer — before you decide where to stick it. <strong>Once the backing is peeled off the magnetic plate and it is attached, the item can no longer be returned under our no-questions-asked policy.</strong> If anything seems wrong with the device, do not peel it — contact us first.</p></div>
+<div class="callout callout-note" data-reveal><p><strong>An alcohol wipe is included</strong></p><p>The device is handled on the workbench during assembly and testing, so a little dust or a fingerprint on the shell is normal — one wipe with the alcohol pad in the box clears it. <strong>Every unit is fully function-tested before it leaves the factory</strong>: lights, buzzer and button are all confirmed working. There is nothing wrong with your unit.</p></div>
+<p>AgentCore-Light shows what your computer or your AI tools are doing through three coloured lights and a buzzer. On Linux you can connect wirelessly over Bluetooth, or wired over a USB cable.</p>
+<h2 id="1-status-at-a-glance"><a class="anchor" href="#1-status-at-a-glance" aria-label="Link to this section">#</a>1. Status at a glance</h2>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>Light</th><th>Meaning</th><th>What to do</th></tr><tr><td><span class="chip chip-all">All LEDs flash</span></td><td>The device is powering on</td><td>Wait for it to enter a connection mode</td></tr><tr><td><span class="chip chip-red chip-blink">Red blinking</span></td><td>Bluetooth mode, waiting for the computer to connect</td><td>Start Bluetooth mode in AgentCore-Light</td></tr><tr><td><span class="chip chip-yellow chip-blink">Yellow blinking</span></td><td>USB serial mode, waiting for the app to connect</td><td>Plug in the USB cable and select Start USB mode in the app</td></tr><tr><td><span class="chip chip-green chip-breathe">Green breathing</span></td><td>The current connection is up; the device is idle and standing by</td><td>You can start using the app or your AI tools</td></tr><tr><td><span class="chip chip-off">All LEDs off</span></td><td>The device is powered off</td><td>Press and hold the button for 3 seconds to power on</td></tr></tbody></table></div>
+<blockquote><p>“Green breathing” means the green light fading slowly up and down. It means the device is connected and standing by — it is not blinking, and it is not a fault.</p></blockquote>
+<h2 id="2-installing-and-starting-the-linux-app"><a class="anchor" href="#2-installing-and-starting-the-linux-app" aria-label="Link to this section">#</a>2. Installing and starting the Linux app</h2>
+<div class="callout callout-important" data-reveal><p><strong>Switch the app to English first.</strong> The app starts up in Chinese. Open <strong>Settings</strong> (top right) → <strong>Language</strong> → <strong>English</strong>. Every button name in this manual is the one you will see after that — for example <strong>Start Bluetooth mode</strong> and <strong>Start USB mode</strong>. Your choice is remembered on this computer.</p></div>
+<h3 id="2-1-installation-steps"><a class="anchor" href="#2-1-installation-steps" aria-label="Link to this section">#</a>2.1 Installation steps</h3>
+<ol>
+<li>Unzip the included <code>AgentCore-Light-linux.tar.gz</code>.</li>
+<li>Open a terminal and change into the folder you extracted.</li>
+<li>The first time only, run:</li>
+</ol>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>chmod +x AgentCore-Light</code></pre></div>
+<ol>
+<li>Start the app:</li>
+</ol>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>./AgentCore-Light</code></pre></div>
+<ol>
+<li>The app opens its local console; if it does not open by itself, visit <a href="http://127.0.0.1:18793/">http://127.0.0.1:18793/</a> in your browser.</li>
+</ol>
+<blockquote><p>The Linux app needs no Python installation and no compiler toolchain. Just run the included <code>AgentCore-Light</code> file directly.</p></blockquote>
+<h3 id="2-2-what-to-do-when-your-browser-or-security-software-says-not-safe"><a class="anchor" href="#2-2-what-to-do-when-your-browser-or-security-software-says-not-safe" aria-label="Link to this section">#</a>2.2 What to do when your browser or security software says “not safe”</h3>
+<p>AgentCore-Light is made by an independent developer. It is <strong>not in any distribution’s software repository and carries no repository signature</strong>, so you may see a warning when you download or extract it. <strong>That is normal for unsigned software — it is not a problem with the software.</strong></p>
+<p><strong>What to do, by the kind of prompt you get:</strong></p>
+<p><strong>① Your browser says “this file isn’t commonly downloaded and might not be safe”</strong></p>
+<p>In your browser’s download list, choose <strong>Keep</strong> (in Firefox: “Allow download”).</p>
+<p><strong>② The archive disappears after downloading, or is deleted automatically</strong></p>
+<p>Some systems’ security policies clean up uncommon archives on their own. Check your browser’s download history and your security software’s activity log, choose <strong>Restore</strong> or <strong>Keep</strong>, then extract the archive again.</p>
+<p><strong>③ Your antivirus or security software flags it</strong></p>
+<p>Linux desktop distributions rarely ship with antivirus software. If you installed security software separately, add <code>AgentCore-Light</code> to its trusted / allow list / exclusions.</p>
+<p><strong>What the software actually does:</strong></p>
+<ul>
+<li>It runs entirely on your own machine. The console page listens on <code>127.0.0.1</code> only, so <strong>only this computer can open it</strong> — other devices on the same local network cannot reach it.</li>
+<li>It sends no data anywhere, apart from checking for software updates.</li>
+<li>The permission step in chapter 3 only adds your user to the <code>dialout</code> group — the standard way to reach serial devices on Linux. It installs no background service.</li>
+<li>Unless you switch on <strong>Start at sign-in</strong> yourself in chapter 8, the app leaves nothing resident on the system.</li>
+</ul>
+<div class="callout callout-note" data-reveal><p>The app runs as an ordinary user throughout. <strong>It does not need <code>sudo</code>, and it should not be started with <code>sudo</code>.</strong> Any instruction telling you to run <code>sudo ./AgentCore-Light</code> is wrong.</p></div>
+<h2 id="3-setting-permissions-before-your-first-usb-connection"><a class="anchor" href="#3-setting-permissions-before-your-first-usb-connection" aria-label="Link to this section">#</a>3. Setting permissions before your first USB connection</h2>
+<p>The first time you use USB serial, Linux may need to grant your account access to serial ports. In a terminal, run this once:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>sudo usermod -aG dialout $USER</code></pre></div>
+<p>After that, <strong>sign out and sign back in</strong> to Linux, or restart the computer. Then start AgentCore-Light.</p>
+<blockquote><p>This step is needed only once. Do not start the app with <code>sudo ./AgentCore-Light</code>.</p></blockquote>
+<h2 id="4-powering-on-powering-off-and-switching-modes"><a class="anchor" href="#4-powering-on-powering-off-and-switching-modes" aria-label="Link to this section">#</a>4. Powering on, powering off and switching modes</h2>
+<h3 id="powering-on-and-off"><a class="anchor" href="#powering-on-and-off" aria-label="Link to this section">#</a>Powering on and off</h3>
+<ul>
+<li><strong>Powering on:</strong> press and hold the device button for about 3 seconds; the device enters Bluetooth mode by default, with red blinking.</li>
+<li><strong>Powering off:</strong> press and hold the device button for about 3 seconds; when the time is up the device switches its status lights off and powers down to a low-power state.</li>
+<li>Plugging in USB does not power the device on. When you want to use it, you still need to press and hold the button.</li>
+</ul>
+<h3 id="switching-connection-modes"><a class="anchor" href="#switching-connection-modes" aria-label="Link to this section">#</a>Switching connection modes</h3>
+<p>A single short press of the device button switches between the two modes:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Bluetooth mode (red blinking)
+        ⇅ short press
+USB serial mode (yellow blinking)</code></pre></div>
+<p>The device runs one transport at a time, to reduce power draw and keep the connection stable.</p>
+<h2 id="5-connecting-over-bluetooth"><a class="anchor" href="#5-connecting-over-bluetooth" aria-label="Link to this section">#</a>5. Connecting over Bluetooth</h2>
+<ol>
+<li>After powering on, check that the red light is blinking.</li>
+<li>Check in your Linux system settings that Bluetooth is switched on; if your computer has no Bluetooth, use the USB connection instead.</li>
+<li>Start AgentCore-Light and open the console.</li>
+<li>Click <strong>Start Bluetooth mode</strong>.</li>
+<li>Wait while the app searches for the device and connects; green breathing on the device means it worked.</li>
+</ol>
+<blockquote><p>On Linux, AgentCore-Light searches for the device and connects on its own. You normally do not need to pair it manually in the system Bluetooth settings first. If the device is not found, check that it is showing red blinking, and that the system Bluetooth service is switched on.</p></blockquote>
+<h2 id="6-connecting-over-usb-serial"><a class="anchor" href="#6-connecting-over-usb-serial" aria-label="Link to this section">#</a>6. Connecting over USB serial</h2>
+<ol>
+<li>Make sure the device is powered on.</li>
+<li>Short-press the button once and check that the yellow light starts blinking.</li>
+<li>Connect the device to your Linux computer with a Type-C cable that supports data transfer.</li>
+<li>In the console, click <strong>Start USB mode</strong>.</li>
+<li>Wait for the app to connect; green breathing on the device means you are ready to go.</li>
+</ol>
+<p>If you see “permission denied”, or the app cannot find the USB device, complete the permission step in chapter 3 first, then unplug and replug the cable and scan again.</p>
+<h2 id="7-the-console-and-your-ai-tools"><a class="anchor" href="#7-the-console-and-your-ai-tools" aria-label="Link to this section">#</a>7. The console and your AI tools</h2>
+<p>Once the device shows green breathing, you can do the following in the console:</p>
+<ul>
+<li>test the red, yellow and green lights, steady on or blinking;</li>
+<li>adjust the overall light brightness (default 30%);</li>
+<li>turn the buzzer on or off and set its volume;</li>
+<li>check battery level, battery voltage and whether USB power is connected;</li>
+<li>open <strong>Connect AI tools</strong> and follow the prompts to install the AI tool integrations you need.</li>
+</ul>
+<p>Once an AI tool is connected, the device can show working, done, error and waiting-for-confirmation states on its own.</p>
+<h3 id="status-light-reference"><a class="anchor" href="#status-light-reference" aria-label="Link to this section">#</a>Status light reference</h3>
+<p>While your AI tools work, the device shows the current state like this:</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>State</th><th>Light</th><th>Notes</th></tr><tr><td>Idle IDLE</td><td><span class="chip chip-green chip-breathe">Green breathing</span></td><td>Nothing is running; after a while idle the light goes to sleep</td></tr><tr><td>Working BUSY</td><td><span class="chip chip-yellow chip-blink">Yellow slow blink</span></td><td>A tool call or task is running, about once a second</td></tr><tr><td>Waiting WAIT_CONFIRM</td><td><span class="chip chip-yellow">Yellow steady</span></td><td>The AI needs you to authorise or confirm something</td></tr><tr><td>Error ERROR</td><td><span class="chip chip-red chip-blink chip-blink-fast">Red fast blink</span></td><td>The task failed or hit an error</td></tr><tr><td>Done SUCCESS</td><td><span class="chip chip-green chip-breathe">Green breathing</span></td><td>On success the green light breathes and the “rising” tone plays, then it returns to idle after 5 seconds</td></tr></tbody></table></div>
+<blockquote><p>Brightness can be adjusted in the console (default 30%). The buzzer can be switched off entirely or have its volume set on its own. After 10 minutes continuously idle the light goes to sleep; after 5 minutes with Bluetooth disconnected the device powers off. See chapter 9.</p></blockquote>
+<h2 id="8-setting-up-start-at-sign-in-optional"><a class="anchor" href="#8-setting-up-start-at-sign-in-optional" aria-label="Link to this section">#</a>8. Setting up start at sign-in (optional)</h2>
+<p>If you want AgentCore-Light to start automatically every time you sign in to Linux, run this once in the folder where you extracted the app:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>./AgentCore-Light install</code></pre></div>
+<p>The app then runs as a background service under your own user. You normally do not need any other commands; to stop it starting automatically, switch <strong>Start at sign-in</strong> off in the console.</p>
+<h2 id="9-standby-sleep-and-auto-power-off"><a class="anchor" href="#9-standby-sleep-and-auto-power-off" aria-label="Link to this section">#</a>9. Standby, sleep and auto power-off</h2>
+<h3 id="9-1-the-idle-breathing-light"><a class="anchor" href="#9-1-the-idle-breathing-light" aria-label="Link to this section">#</a>9.1 The idle breathing light</h3>
+<p>Once an AI tool is connected, the light is handed over to the app: with nothing running, the green light shows <strong>low-brightness breathing</strong>, a little dimmer than the normal working brightness, which is also a power-saving measure. Right after connecting, before the app has taken over the light, the green light breathes in the same way — seeing it fade slowly up and down means the connection is ready.</p>
+<h3 id="9-2-going-to-sleep-after-a-while-idle"><a class="anchor" href="#9-2-going-to-sleep-after-a-while-idle" aria-label="Link to this section">#</a>9.2 Going to sleep after a while idle</h3>
+<p>After <strong>10 minutes</strong> continuously idle (the default), the device turns all status lights off and goes to sleep, saving more power. The connection stays up while it sleeps; when your AI tool has new work the light <strong>comes back on by itself, with no button press needed</strong>.</p>
+<h3 id="9-3-auto-power-off-when-bluetooth-drops"><a class="anchor" href="#9-3-auto-power-off-when-bluetooth-drops" aria-label="Link to this section">#</a>9.3 Auto power-off when Bluetooth drops</h3>
+<p>In Bluetooth mode, if there is no connection for <strong>5 minutes</strong> continuously (the computer shut down, Bluetooth was switched off, or the app quit), the device <strong>powers itself off</strong>; <strong>this happens even while USB charging is plugged in</strong>. When you want to use it again, press and hold the button for about 3 seconds to power on.</p>
+<div class="callout callout-tip" data-reveal><p>Both of those times can be changed: idle sleep defaults to 10 minutes and disconnect power-off to 5 minutes, both in the range 0–3600 seconds, where 0 turns the automatic action off. Developers can change them with the API commands <code>IDLE_SLEEP_SEC:</code> and <code>BT_DISCONNECT_OFF_SEC:</code> (see section 15 of the API manual); everyone else can contact support.</p></div>
+<h3 id="9-4-charging-and-battery-life"><a class="anchor" href="#9-4-charging-and-battery-life" aria-label="Link to this section">#</a>9.4 Charging and battery life</h3>
+<ul>
+<li>You can charge the device from any ordinary USB power source.</li>
+<li>While USB is connected and the battery is not full, the charge indicator is on; once it is full, the full indicator is on.</li>
+<li>On battery power both the charge and full indicators are off, which is normal power-saving design.</li>
+<li>When you are not using it, press and hold the button to power it off.</li>
+</ul>
+<h2 id="10-troubleshooting"><a class="anchor" href="#10-troubleshooting" aria-label="Link to this section">#</a>10. Troubleshooting</h2>
+<h3 id="the-app-will-not-start"><a class="anchor" href="#the-app-will-not-start" aria-label="Link to this section">#</a>The app will not start</h3>
+<ul>
+<li>Check that you have run <code>chmod +x AgentCore-Light</code> in the app’s folder.</li>
+<li>Run <code>./AgentCore-Light</code> from a terminal; do not double-click unknown files.</li>
+</ul>
+<h3 id="usb-connection-fails-or-says-permission-denied"><a class="anchor" href="#usb-connection-fails-or-says-permission-denied" aria-label="Link to this section">#</a>USB connection fails, or says permission denied</h3>
+<ul>
+<li>Check that you have run the <code>dialout</code> permission command from chapter 3, and signed out and back in.</li>
+<li>Swap in a Type-C cable that supports data transfer.</li>
+<li>Check that the device is in USB serial mode, showing yellow blinking.</li>
+</ul>
+<h3 id="bluetooth-mode-keeps-blinking-red"><a class="anchor" href="#bluetooth-mode-keeps-blinking-red" aria-label="Link to this section">#</a>Bluetooth mode keeps blinking red</h3>
+<ul>
+<li>Check that Bluetooth is switched on in Linux and that your computer has Bluetooth.</li>
+<li>Click <strong>Start Bluetooth mode</strong> in the console.</li>
+<li>Switch Bluetooth off and back on, then start Bluetooth mode again.</li>
+</ul>
+<h3 id="the-light-does-not-change"><a class="anchor" href="#the-light-does-not-change" aria-label="Link to this section">#</a>The light does not change</h3>
+<ul>
+<li>Check that the device shows green breathing.</li>
+<li>In <strong>Light control</strong>, test any colour first.</li>
+<li>Check that the <strong>Brightness</strong> is not set to 0%.</li>
+</ul>
+<h3 id="there-is-dust-or-a-fingerprint-on-the-shell-has-it-been-used"><a class="anchor" href="#there-is-dust-or-a-fingerprint-on-the-shell-has-it-been-used" aria-label="Link to this section">#</a>There is dust or a fingerprint on the shell — has it been used?</h3>
+<p>No. Every unit is assembled and fully function-tested before it leaves the factory (power, light effects, buzzer, button). It is handled on the workbench during testing and packing, so a little dust or a fingerprint on the shell is normal and does not affect anything. One wipe with the <strong>alcohol pad</strong> in the box clears it; the unit works fine.</p>
+<h3 id="after-a-while-idle-the-light-goes-out-by-itself"><a class="anchor" href="#after-a-while-idle-the-light-goes-out-by-itself" aria-label="Link to this section">#</a>After a while idle the light goes out by itself</h3>
+<p>Not a fault: after 10 minutes continuously idle the device turns the lights off and sleeps. The connection is not dropped, and the light comes back by itself when your AI tool has new work — no button press needed. See <strong>9.2 Going to sleep after a while idle</strong>.</p>
+<h3 id="the-device-powered-itself-off"><a class="anchor" href="#the-device-powered-itself-off" aria-label="Link to this section">#</a>The device powered itself off</h3>
+<p>In Bluetooth mode, after 5 minutes with no connection (computer shut down, Bluetooth off, or app quit) the device powers itself off — plugging in USB does not prevent it. Press and hold the button for about 3 seconds to power on again. See <strong>9.3 Auto power-off when Bluetooth drops</strong>.</p>
+<h2 id="11-precautions"><a class="anchor" href="#11-precautions" aria-label="Link to this section">#</a>11. Precautions</h2>
+<ul>
+<li>Do not open the device, short its connectors, or use a power supply that does not match.</li>
+<li>Avoid using or charging it in damp, hot or flammable surroundings.</li>
+<li>For firmware updates, repairs or fault-finding, contact support — we do not recommend customers doing this themselves.</li>
+</ul>
+      </article>
+    </div>
+  </main>
+
+  <button class="to-top" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>AgentCore-Light · User Manual</span>
+      <span class="footer-shop">Official store: <a href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener">AgentCore-Light on Taobao ↗</a></span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+  </script>
+  <script src="../site.js" defer></script>
+</body>
+</html>

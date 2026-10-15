@@ -1,0 +1,495 @@
+/* ==========================================================================
+   AgentCore-Light · 「3 分钟用起来」快速上手站 —— 本站特有样式
+   --------------------------------------------------------------------------
+   这个文件只放**快速上手站独有的东西**：开箱提醒、识别卡片、步骤卡、
+   系统切换胶囊、按键图、折叠问答、页脚入口。
+
+   配色、字体、圆角、阴影全部用 style.css 里的设计变量（--surface / --line /
+   --accent / --radius …），**不引入任何新颜色**，所以和完整手册站看上去
+   是同一个产品。
+
+   目录：
+     0. 基础补充（行内代码、小标题）
+     1. 按系统显示 / 隐藏（.os-only）
+     2. 开箱提醒（磁铁片 / 酒精棉片）
+     3. 识别卡片与下载按钮
+     4. 系统切换胶囊
+     5. 步骤卡
+     6. 按键图
+     7. 灯效速查补充
+     8. 折叠问答（卡住了？）
+     9. 页脚完整手册入口
+     10. 响应式
+   ========================================================================== */
+
+/* ---------- 0. 基础补充 ---------- */
+/* style.css 里的行内代码样式是挂在 .guide-content 底下的（手册正文专用），
+   这一页没有那个容器，所以照搬一份到 .home 上。 */
+.home code {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: .89em;
+  word-break: break-word;
+}
+
+/* 章节大标题下面的小标题（「还没连 AI 工具时」这类） */
+.section-title-sub {
+  margin-top: 30px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line);
+  font-size: 17px;
+}
+
+/* ---------- 1. 按系统显示 / 隐藏 ---------- */
+/* 页面在 <head> 里就把识别结果写到 <html data-os="…">（见 index.html 顶部的小脚本）。
+
+   **没有 data-os 时什么都不藏** —— 客户关掉 JS、或者浏览器认不出来时，
+   三个系统的步骤会依次列出来，页面照样能读、照样能用，不会出现空白。
+   客户端手动切换后 data-os 会跟着变，这里的三条规则就自动生效。 */
+html[data-os="windows"] .os-only:not([data-for="windows"]) { display: none; }
+html[data-os="macos"]   .os-only:not([data-for="macos"])   { display: none; }
+html[data-os="linux"]   .os-only:not([data-for="linux"])   { display: none; }
+
+/* ---------- 2. 开箱提醒 ---------- */
+/* 页面最靠前的一块：磁铁片和酒精棉片。用暖黄调（跟「注意」提示框同一个色系），
+   让它一眼看上去就是「请先读」，而不是一张普通的正文卡片。 */
+.notice {
+  margin: 30px 0 0;
+  padding: 22px 26px 24px;
+  border: 1px solid color-mix(in srgb, var(--yellow) 38%, var(--line));
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--yellow) 10%, var(--surface)), var(--surface) 68%);
+  box-shadow: var(--shadow-sm);
+}
+.notice-title {
+  margin: 0 0 15px;
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+.notice-title::before { content: "⚠️"; margin-right: 7px; letter-spacing: 0; }
+.notice-grid {
+  display: grid;
+  gap: 16px 28px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.notice-item h2 { margin: 0 0 7px; font-size: 17px; }
+.notice-item p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.7; }
+.notice-item strong { color: var(--ink-strong); }
+
+/* ---------- 3. 识别卡片与下载按钮 ---------- */
+/* 首页 hero 下面第一块：告诉客户「认出来你在用哪个系统」，并把下载按钮递到手边 */
+.detect {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  margin: 30px 0 0;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.detect-kicker {
+  margin: 0 0 6px;
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+.detect-title {
+  margin: 0 0 8px;
+  font-size: clamp(20px, 2.6vw, 25px);
+  letter-spacing: -.03em;
+}
+.detect-note {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+.detect-note code {
+  font-size: .92em;
+}
+
+/* 下载按钮竖排，三个系统的标签长短不一也整齐（和完整手册站的下载卡片一致） */
+.detect-actions { display: grid; gap: 9px; flex: 0 0 auto; }
+.detect .download-btn { min-width: 246px; margin-top: 0; }
+.detect .download-item { display: grid; gap: 5px; }
+.detect .download-version {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* 没有 JS 时三个下载块会一起出现，给它们之间留点距离，别糊成一团 */
+.detect-actions .os-only + .os-only { margin-top: 14px; }
+
+/* ---------- 4. 系统切换胶囊 ---------- */
+/* 胶囊要靠脚本来干活，没 JS 时它点了没反应，不如不显示。
+   index.html 顶部的小脚本会给 <html> 加上 data-js="on"。 */
+html:not([data-js="on"]) [data-js-only] { display: none; }
+
+/* 「认错了？」—— 客户手动改系统用。做得很轻，正常情况没人需要点它 */
+.os-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 22px 0 0;
+}
+.os-switch-label {
+  margin: 0 4px 0 0;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.os-pill {
+  padding: 6px 15px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.os-pill:hover { border-color: var(--accent); color: var(--accent-ink); }
+.os-pill[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+/* ---------- 5. 步骤卡 ---------- */
+/* 每一大步一张卡，左边一个圆形序号。四步看下来就是一屏多一点 */
+.steps {
+  display: grid;
+  gap: 16px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.step {
+  display: grid;
+  gap: 0 20px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.step-num {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1;
+}
+.step-body { min-width: 0; }
+.step-body > h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+  margin: 8px 0 0;
+  font-size: 19px;
+}
+/* 标题边上的小标签，比如「不用选系统」「按系统切换」 */
+.step-tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.step-body p { margin: 10px 0 0; font-size: 15.5px; line-height: 1.75; }
+.step-body ol, .step-body ul { margin: 10px 0 0; padding-left: 22px; }
+.step-body li { margin: 5px 0; font-size: 15.5px; line-height: 1.75; }
+.step-body li::marker { color: var(--accent); }
+.step-body > *:first-child { margin-top: 8px; }
+
+/* 卡片内部的提示框比正文里的小一号，别抢戏。
+   左内边距必须留得下 style.css 里那个绝对定位的图标（默认 50px），
+   整体缩小的时候很容易把它压到文字底下。 */
+.step .callout { margin: 14px 0 0; padding: 12px 16px 12px 42px; font-size: 14.5px; }
+.step .callout::before { left: 13px; top: 12px; font-size: 14px; }
+.step .callout p { margin: 4px 0; font-size: 14.5px; }
+.step .callout p:first-child { margin-top: 0; }
+.step .callout p:last-child { margin-bottom: 0; }
+.step .callout code { word-break: break-all; }
+
+/* 卡里的小命令块：客户要原样敲进终端，给他一个单独的浅色条 */
+.step-command {
+  margin: 12px 0 0;
+  padding: 11px 15px;
+  border-radius: var(--radius-sm);
+  background: var(--code-bg);
+  color: var(--code-ink);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+}
+/* 放进提示框里的时候别再叠一层内边距，跟着提示框走 */
+.step .callout .step-command { margin: 9px 0 0; font-size: 13px; }
+
+/* 蓝牙 / USB 两个办法并排，客户挑一个就行 */
+.ways {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0 0;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.way {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+}
+.way-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0 0 8px;
+  font-size: 15.5px;
+}
+.way-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.way-badge-plain {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  font-weight: 500;
+}
+.way ol { margin: 0; padding-left: 20px; }
+.way li { font-size: 14.5px; line-height: 1.7; }
+
+/* ---------- 6. 按键图 ---------- */
+/* 用一张小图说清「短按」「长按」，比写一段文字快 */
+.keys {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0 0;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+}
+.key-card {
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.key-card p { margin: 12px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.7; }
+.key-card strong { color: var(--ink-strong); }
+.key-figure { display: flex; gap: 12px; align-items: center; }
+/* 按键图：做成一枚浅绿色的实体按钮。深色模式下 --line-strong 和底色太接近，
+   光靠灰边会糊成一团，所以掺一点品牌绿进去，两种主题下都看得清。 */
+.key-cap {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 2px solid color-mix(in srgb, var(--accent) 42%, var(--line-strong));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-soft));
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--accent) 26%, var(--line));
+  color: var(--accent-ink);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+.key-hold {
+  position: relative;
+  overflow: hidden;
+}
+/* 长按：一圈进度在 3 秒里走完，直观表达「按住别松手」 */
+.key-hold::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .18;
+  scale: 0 1;
+  transform-origin: left center;
+  animation: key-hold-fill 3s ease-in-out infinite;
+}
+.key-hold span { position: relative; z-index: 1; }
+@keyframes key-hold-fill {
+  0%, 8%   { scale: 0 1; }
+  55%, 72% { scale: 1 1; }
+  100%     { scale: 1 1; opacity: 0; }
+}
+.key-tap { animation: key-tap-press 2.4s ease-in-out infinite; }
+@keyframes key-tap-press {
+  0%, 62%, 100% { box-shadow: inset 0 -3px 0 var(--line); }
+  70%, 80%      { box-shadow: inset 0 0 0 var(--line); translate: 0 2px; }
+}
+
+/* ---------- 7. 灯效速查补充 ---------- */
+/* 连接状态那几条直接用完整手册站的 .chip 灯牌（会闪），这里只补排版 */
+.lamp-list {
+  display: grid;
+  gap: 2px;
+  margin: 18px 0 0;
+  padding: 6px 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.lamp-row {
+  display: grid;
+  gap: 4px 20px;
+  grid-template-columns: 172px minmax(0, 1fr);
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+}
+.lamp-row + .lamp-row { border-top: 1px solid var(--line); }
+.lamp-row .chip { justify-self: start; }
+.lamp-row p { margin: 0; font-size: 15px; }
+.lamp-row .lamp-mean { color: var(--muted); font-size: 14.5px; }
+
+/* 状态灯牌是 nowrap 的，172px 是按中文四个字量的。英文最长的一条
+   （Yellow slow blink）会顶到右边说明文字上，给英文留宽一点。 */
+html[lang="en"] .lamp-row { grid-template-columns: 200px minmax(0, 1fr); }
+
+/* AI 接管后的五张灯牌沿用首页的 .ai-states 网格，这里只把标题收小一点 */
+.ai-states-quiet h3 { font-size: 16px; }
+.ai-states-quiet p { font-size: 14px; }
+
+/* ---------- 8. 折叠问答 ---------- */
+/* 客户遇到问题才展开，平时页面只有几行标题 —— 这是「内容不多」的关键 */
+.fixes {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+}
+.fix {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  overflow: hidden;
+}
+.fix > summary {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 15px 20px;
+  color: var(--ink-strong);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.55;
+  cursor: pointer;
+  list-style: none;
+}
+.fix > summary::-webkit-details-marker { display: none; }
+.fix > summary::after {
+  content: "＋";
+  margin-left: auto;
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 400;
+  transition: rotate .18s ease;
+}
+.fix[open] > summary::after { content: "－"; }
+.fix > summary:hover { background: var(--surface-soft); }
+.fix > summary:focus-visible { outline-offset: -3px; }
+.fix-body {
+  padding: 0 20px 17px;
+  border-top: 1px solid var(--line);
+}
+.fix-body p { margin: 12px 0 0; font-size: 15px; line-height: 1.75; color: var(--muted); }
+.fix-body strong { color: var(--ink-strong); }
+.fix-body ol, .fix-body ul { margin: 12px 0 0; padding-left: 22px; }
+.fix-body li { margin: 5px 0; font-size: 15px; line-height: 1.75; color: var(--muted); }
+.fix-body li::marker { color: var(--accent); }
+.fix-body code { word-break: break-all; }
+
+/* ---------- 9. 页脚完整手册入口 ---------- */
+.more-box {
+  display: grid;
+  gap: 16px 26px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  margin: 58px 0 0;
+  padding: 24px 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+}
+.more-box h2 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.03em; }
+.more-box p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.7; }
+.more-links { display: flex; flex-wrap: wrap; gap: 9px; }
+.more-link {
+  padding: 9px 17px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  white-space: nowrap;
+  transition: border-color .15s ease, color .15s ease;
+}
+.more-link:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+
+/* ---------- 10. 响应式 ---------- */
+/* 窄屏顶栏：这一页的导航和完整手册站一样多，品牌名会被挤到换行。
+   品牌名不让它断行，「AgentCore-Light」折成两半很难看；中间那三色灯是纯装饰，
+   窄屏上会和导航挤在一起，让位。这几条只影响快速上手站。 */
+@media (max-width: 620px) {
+  /* 导航占满一整行、排到品牌下面那套规则（.header-nav 的 width:100% + order:3）
+     和它依赖的 .header-row 换行，2026-10 已经一起搬进 style.css 了 —— 手册页不
+     加载这个文件，规则留在这边它们吃不到。 */
+
+  /* 品牌名不让它断行，「AgentCore-Light」折成两半很难看 */
+  .brand { gap: 9px; font-size: 15px; }
+  .brand > span:last-child { white-space: nowrap; }
+}
+
+@media (max-width: 720px) {
+  .notice { padding: 19px 18px 20px; }
+  .detect { grid-template-columns: minmax(0, 1fr); padding: 22px 20px; }
+  .detect-actions { justify-items: stretch; }
+  .detect .download-btn { min-width: 0; }
+  .more-box { grid-template-columns: minmax(0, 1fr); }
+  .lamp-row { grid-template-columns: minmax(0, 1fr); }
+  .step { grid-template-columns: 36px minmax(0, 1fr); padding: 19px 18px; gap: 0 14px; }
+  .step-num { width: 36px; height: 36px; font-size: 16px; }
+  .step-body > h3 { margin-top: 5px; font-size: 17.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key-hold::after, .key-tap { animation: none; }
+}

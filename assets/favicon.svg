@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AgentCore-Light">
+  <rect width="64" height="64" rx="14" fill="#101f24"/>
+  <rect x="14" y="15" width="36" height="9" rx="4.5" fill="#e85b5b"/>
+  <rect x="14" y="27.5" width="36" height="9" rx="4.5" fill="#dd9a1c"/>
+  <rect x="14" y="40" width="36" height="9" rx="4.5" fill="#12a37f"/>
+</svg>

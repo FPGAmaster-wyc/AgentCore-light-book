@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentCore-Light Windows 使用手册</title>
+  <meta name="description" content="配对蓝牙或使用 USB 串口连接">
+  <meta name="theme-color" content="#f3f6f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1517" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/windows.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/windows.html">
+  <link rel="alternate" hreflang="en" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/windows.html">
+  <link rel="alternate" hreflang="x-default" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/windows.html">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // 尽早套用上次选择的主题，避免刷新时闪白
+    try {
+      var savedTheme = localStorage.getItem('agentcore-manual-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (error) {}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到正文</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header site-header--dense">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>AgentCore-Light<small>客户使用手册</small></span>
+      </a>
+      <div class="header-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <nav class="header-nav" aria-label="手册导航">
+        <a class="tab active" href="windows.html" aria-current="page">Windows</a>
+        <a class="tab" href="macos.html">macOS</a>
+        <a class="tab" href="linux.html">Linux</a>
+        <a class="tab" href="api.html">API调用手册</a>
+        <a class="tab tab-shop" href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener" title="官方店铺 · 售后与配件">官方店铺</a>
+        <a class="tab tab-lang" href="en/windows.html" hreflang="en" lang="en" title="Switch to English" data-lang="en">EN</a>
+        <button class="icon-btn" id="printBtn" type="button" aria-label="打印或另存为 PDF" title="打印 / 存为 PDF">🖨️</button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切换深浅色">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap layout" id="content">
+    <aside class="toc-side">
+      <nav class="toc" aria-label="本页目录"><p class="toc-title">本页目录</p><ol><li class="lvl-2"><a href="#download-panel">下载客户端</a></li><li class="lvl-2"><a href="#1-产品状态速查">1. 产品状态速查</a></li><li class="lvl-2"><a href="#2-首次使用">2. 首次使用</a><ol><li class="lvl-3"><a href="#2-1-准备工作">2.1 准备工作</a></li><li class="lvl-3"><a href="#2-2-系统提示-不安全-怎么办">2.2 系统提示“不安全”怎么办</a></li><li class="lvl-3"><a href="#2-3-开机">2.3 开机</a></li><li class="lvl-3"><a href="#2-4-关机">2.4 关机</a></li></ol></li><li class="lvl-2"><a href="#3-使用蓝牙连接-推荐日常无线使用">3. 使用蓝牙连接（推荐日常无线使用）</a><ol><li class="lvl-3"><a href="#3-1-在-windows-中配对">3.1 在 Windows 中配对</a></li><li class="lvl-3"><a href="#3-2-在-agentcore-light-中连接">3.2 在 AgentCore-Light 中连接</a></li></ol></li><li class="lvl-2"><a href="#4-使用-usb-串口连接">4. 使用 USB 串口连接</a><ol><li class="lvl-3"><a href="#4-1-切换到-usb-模式">4.1 切换到 USB 模式</a></li><li class="lvl-3"><a href="#4-2-在电脑上连接">4.2 在电脑上连接</a></li></ol></li><li class="lvl-2"><a href="#5-在两种连接方式之间切换">5. 在两种连接方式之间切换</a></li><li class="lvl-2"><a href="#6-软件基础操作">6. 软件基础操作</a><ol><li class="lvl-3"><a href="#6-1-手动测试灯光">6.1 手动测试灯光</a></li><li class="lvl-3"><a href="#6-2-调整亮度">6.2 调整亮度</a></li><li class="lvl-3"><a href="#6-3-蜂鸣器">6.3 蜂鸣器</a></li><li class="lvl-3"><a href="#6-4-电池电量">6.4 电池电量</a></li><li class="lvl-3"><a href="#6-5-退出软件">6.5 退出软件</a></li></ol></li><li class="lvl-2"><a href="#7-连接-ai-工具">7. 连接 AI 工具</a><ol><li class="lvl-3"><a href="#豆包-doubao-的特别说明">豆包（Doubao）的特别说明</a></li><li class="lvl-3"><a href="#设备状态灯效对照">设备状态灯效对照</a></li></ol></li><li class="lvl-2"><a href="#8-待机-休眠与自动关机">8. 待机、休眠与自动关机</a><ol><li class="lvl-3"><a href="#8-1-空闲时的呼吸灯">8.1 空闲时的呼吸灯</a></li><li class="lvl-3"><a href="#8-2-连续空闲自动熄灯-休眠">8.2 连续空闲自动熄灯（休眠）</a></li><li class="lvl-3"><a href="#8-3-蓝牙断连自动关机">8.3 蓝牙断连自动关机</a></li><li class="lvl-3"><a href="#8-4-充电与续航建议">8.4 充电与续航建议</a></li></ol></li><li class="lvl-2"><a href="#9-常见问题">9. 常见问题</a><ol><li class="lvl-3"><a href="#杀毒软件说这个软件是病毒">杀毒软件说这个软件是病毒</a></li><li class="lvl-3"><a href="#按住按键后设备没有开机">按住按键后设备没有开机</a></li><li class="lvl-3"><a href="#蓝牙模式一直红灯闪烁">蓝牙模式一直红灯闪烁</a></li><li class="lvl-3"><a href="#usb-模式一直黄灯闪烁">USB 模式一直黄灯闪烁</a></li><li class="lvl-3"><a href="#软件显示连接成功-但灯光没有变化">软件显示连接成功，但灯光没有变化</a></li><li class="lvl-3"><a href="#蓝牙和-usb-能否同时使用">蓝牙和 USB 能否同时使用？</a></li><li class="lvl-3"><a href="#设备外壳上有灰尘或指纹-是别人用过的吗">设备外壳上有灰尘或指纹，是别人用过的吗？</a></li><li class="lvl-3"><a href="#空闲一会儿-灯自己灭了">空闲一会儿，灯自己灭了</a></li><li class="lvl-3"><a href="#设备自己关机了">设备自己关机了</a></li></ol></li><li class="lvl-2"><a href="#10-使用注意事项">10. 使用注意事项</a></li></ol></nav>
+    </aside>
+
+    <div>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav class="toc" aria-label="本页目录"><p class="toc-title">本页目录</p><ol><li class="lvl-2"><a href="#download-panel">下载客户端</a></li><li class="lvl-2"><a href="#1-产品状态速查">1. 产品状态速查</a></li><li class="lvl-2"><a href="#2-首次使用">2. 首次使用</a><ol><li class="lvl-3"><a href="#2-1-准备工作">2.1 准备工作</a></li><li class="lvl-3"><a href="#2-2-系统提示-不安全-怎么办">2.2 系统提示“不安全”怎么办</a></li><li class="lvl-3"><a href="#2-3-开机">2.3 开机</a></li><li class="lvl-3"><a href="#2-4-关机">2.4 关机</a></li></ol></li><li class="lvl-2"><a href="#3-使用蓝牙连接-推荐日常无线使用">3. 使用蓝牙连接（推荐日常无线使用）</a><ol><li class="lvl-3"><a href="#3-1-在-windows-中配对">3.1 在 Windows 中配对</a></li><li class="lvl-3"><a href="#3-2-在-agentcore-light-中连接">3.2 在 AgentCore-Light 中连接</a></li></ol></li><li class="lvl-2"><a href="#4-使用-usb-串口连接">4. 使用 USB 串口连接</a><ol><li class="lvl-3"><a href="#4-1-切换到-usb-模式">4.1 切换到 USB 模式</a></li><li class="lvl-3"><a href="#4-2-在电脑上连接">4.2 在电脑上连接</a></li></ol></li><li class="lvl-2"><a href="#5-在两种连接方式之间切换">5. 在两种连接方式之间切换</a></li><li class="lvl-2"><a href="#6-软件基础操作">6. 软件基础操作</a><ol><li class="lvl-3"><a href="#6-1-手动测试灯光">6.1 手动测试灯光</a></li><li class="lvl-3"><a href="#6-2-调整亮度">6.2 调整亮度</a></li><li class="lvl-3"><a href="#6-3-蜂鸣器">6.3 蜂鸣器</a></li><li class="lvl-3"><a href="#6-4-电池电量">6.4 电池电量</a></li><li class="lvl-3"><a href="#6-5-退出软件">6.5 退出软件</a></li></ol></li><li class="lvl-2"><a href="#7-连接-ai-工具">7. 连接 AI 工具</a><ol><li class="lvl-3"><a href="#豆包-doubao-的特别说明">豆包（Doubao）的特别说明</a></li><li class="lvl-3"><a href="#设备状态灯效对照">设备状态灯效对照</a></li></ol></li><li class="lvl-2"><a href="#8-待机-休眠与自动关机">8. 待机、休眠与自动关机</a><ol><li class="lvl-3"><a href="#8-1-空闲时的呼吸灯">8.1 空闲时的呼吸灯</a></li><li class="lvl-3"><a href="#8-2-连续空闲自动熄灯-休眠">8.2 连续空闲自动熄灯（休眠）</a></li><li class="lvl-3"><a href="#8-3-蓝牙断连自动关机">8.3 蓝牙断连自动关机</a></li><li class="lvl-3"><a href="#8-4-充电与续航建议">8.4 充电与续航建议</a></li></ol></li><li class="lvl-2"><a href="#9-常见问题">9. 常见问题</a><ol><li class="lvl-3"><a href="#杀毒软件说这个软件是病毒">杀毒软件说这个软件是病毒</a></li><li class="lvl-3"><a href="#按住按键后设备没有开机">按住按键后设备没有开机</a></li><li class="lvl-3"><a href="#蓝牙模式一直红灯闪烁">蓝牙模式一直红灯闪烁</a></li><li class="lvl-3"><a href="#usb-模式一直黄灯闪烁">USB 模式一直黄灯闪烁</a></li><li class="lvl-3"><a href="#软件显示连接成功-但灯光没有变化">软件显示连接成功，但灯光没有变化</a></li><li class="lvl-3"><a href="#蓝牙和-usb-能否同时使用">蓝牙和 USB 能否同时使用？</a></li><li class="lvl-3"><a href="#设备外壳上有灰尘或指纹-是别人用过的吗">设备外壳上有灰尘或指纹，是别人用过的吗？</a></li><li class="lvl-3"><a href="#空闲一会儿-灯自己灭了">空闲一会儿，灯自己灭了</a></li><li class="lvl-3"><a href="#设备自己关机了">设备自己关机了</a></li></ol></li><li class="lvl-2"><a href="#10-使用注意事项">10. 使用注意事项</a></li></ol></nav>
+      </details>
+      <article class="guide-content">
+<h1 id="agentcore-light-客户使用手册">AgentCore-Light 客户使用手册</h1>
+<section class="download-panel" id="download-panel" data-reveal><div class="download-panel-copy"><span class="download-panel-kicker">第一步 · 下载软件</span><h2>下载 Windows 客户端</h2><p>适用于 Windows 10 / 11。下载后解压，再双击里面的 <code>AgentCore-Light.exe</code> 运行。</p></div><div class="download-panel-actions"><div class="download-item"><a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light.zip" download>下载 Windows 版 <span>↓</span></a><p class="download-version">当前版本 v2.1.2</p></div></div></section>
+<aside class="download-note" data-reveal><p class="download-note-title">第一次运行被系统拦住了？</p><p class="download-note-intro">软件没有购买付费的代码签名证书，Windows 或杀毒软件提示“不安全”属于正常现象，<strong>不是病毒</strong>。</p><ul><li><strong>“Windows 已保护你的电脑”</strong> → 点“更多信息”，再点“仍要运行”</li><li><strong>浏览器提示“不常下载，可能不安全”</strong> → 在下载列表里选“保留”</li><li><strong>杀毒软件报警、或文件被隔离</strong> → 在杀毒软件里加入信任；已被隔离的到“Windows 安全中心 → 保护历史记录”恢复</li></ul><a class="download-note-more" href="#2-2-系统提示-不安全-怎么办">看详细说明 → 2.2 系统提示“不安全”怎么办</a></aside>
+<div class="meta" data-reveal><p>适用产品：AgentCore-Light 桌面状态指示灯</p><p>适用软件：AgentCore-Light Windows 客户端</p></div>
+<div class="callout callout-important" data-reveal><p><strong>磁铁片粘贴与售后提醒</strong></p><p>包装内附有磁铁片，方便将设备固定在合适的位置。请在收到商品后，先完成开机、连接、灯光、蜂鸣器等全部功能测试，再决定粘贴位置。<strong>磁铁片撕开背胶并粘贴后，不支持无理由退货。</strong>如发现商品异常，请勿粘贴，先联系售后处理。</p></div>
+<div class="callout callout-note" data-reveal><p><strong>包装内附有一片酒精棉片</strong></p><p>设备在出厂组装和测试时会接触工作台，外壳上可能留下少量灰尘或指纹，属于正常现象——用包装内附带的酒精棉片擦拭一遍即可擦净。<strong>每台设备出厂前都做过完整功能测试</strong>，灯效、蜂鸣器、按键均确认正常，功能没有问题，请放心使用。</p></div>
+<p>AgentCore-Light 是一台通过三色灯和提示音展示电脑工作状态的桌面设备。它可使用蓝牙无线连接，也可通过 USB 数据线连接电脑。电脑端软件可手动控制灯光和蜂鸣器，也可连接 AI 工具，让设备自动显示工作、完成、报错或等待确认等状态。</p>
+<h2 id="1-产品状态速查"><a class="anchor" href="#1-产品状态速查" aria-label="本节链接">#</a>1. 产品状态速查</h2>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>指示状态</th><th>含义</th><th>您需要做什么</th></tr><tr><td><span class="chip chip-all">三色灯短暂亮起</span></td><td>设备正在开机</td><td>等待进入连接状态</td></tr><tr><td><span class="chip chip-red chip-blink">红灯闪烁</span></td><td>蓝牙模式，等待电脑连接</td><td>在 Windows 和 AgentCore-Light 软件中连接蓝牙</td></tr><tr><td><span class="chip chip-yellow chip-blink">黄灯闪烁</span></td><td>USB 串口模式，等待电脑软件连接</td><td>插入 USB 数据线，并在软件中启动 USB 串口模式</td></tr><tr><td><span class="chip chip-green chip-breathe">绿灯呼吸</span></td><td>当前连接方式已建立，设备处于空闲待命状态</td><td>可以开始使用软件、灯光控制或 AI 工具</td></tr><tr><td><span class="chip chip-off">所有状态灯熄灭</span></td><td>设备已关机</td><td>长按按键 3 秒开机</td></tr></tbody></table></div>
+<blockquote><p>「绿灯呼吸」指绿灯缓慢地一亮一暗，表示设备已连接、正在待命，不是闪烁也不是故障。</p></blockquote>
+<blockquote><p>红、黄、绿三色灯用于显示工作状态；充电/充满指示灯只会在 USB 已接入时亮起。使用电池供电时，充电指示灯与充满指示灯均会关闭，以节省电量。</p></blockquote>
+<h2 id="2-首次使用"><a class="anchor" href="#2-首次使用" aria-label="本节链接">#</a>2. 首次使用</h2>
+<h3 id="2-1-准备工作"><a class="anchor" href="#2-1-准备工作" aria-label="本节链接">#</a>2.1 准备工作</h3>
+<ol>
+<li>为设备充电，或确认设备电量充足。</li>
+<li>解压下载到的 <code>AgentCore-Light.zip</code>，得到主程序 <code>AgentCore-Light.exe</code>。</li>
+<li>如使用 USB 连接，请使用支持数据传输的 Type-C 数据线；</li>
+<li>如使用蓝牙连接，请确认电脑具有蓝牙功能并已打开蓝牙。</li>
+</ol>
+<div class="callout callout-important" data-reveal><p>第一次运行 <code>AgentCore-Light.exe</code> 时，Windows 可能弹出“已保护你的电脑”，或者杀毒软件报警。<strong>这是未签名软件的正常现象，不是软件有问题</strong>，处理方法见下一节 <strong>2.2</strong>。</p></div>
+<h3 id="2-2-系统提示-不安全-怎么办"><a class="anchor" href="#2-2-系统提示-不安全-怎么办" aria-label="本节链接">#</a>2.2 系统提示“不安全”怎么办</h3>
+<p>AgentCore-Light 由一个独立开发者制作，<strong>没有购买付费的代码签名证书</strong>，也没有做发布者认证。所以第一次运行时，Windows 或杀毒软件可能会拦一下——<strong>这是缺少签名导致的，不是软件里有病毒</strong>。</p>
+<p><strong>为什么会被拦？</strong></p>
+<ul>
+<li>Windows 的 SmartScreen 主要看“这个文件有多少人下载过”。刚发布的新版本下载量少，就会被标成“不常见的应用”，这跟文件本身是否安全没有关系。</li>
+<li>杀毒软件对“没有签名、又不是大众软件”的程序普遍采取保守策略，常见做法是直接拦下或隔离，宁可错杀。</li>
+</ul>
+<p><strong>这个软件实际上做什么：</strong></p>
+<ul>
+<li>只在本机运行。控制台网页只监听 <code>127.0.0.1</code>，也就是<strong>只有这台电脑打得开</strong>，同一个局域网里的其它设备也访问不到。</li>
+<li>除了检查软件更新，不向外部发送任何数据。</li>
+<li>开机自启动写在<strong>当前用户</strong>的注册表项里，不需要管理员权限，也不会改动系统设置或其它软件。</li>
+</ul>
+<p><strong>按提示类型处理：</strong></p>
+<p><strong>① 蓝色窗口“Windows 已保护你的电脑”</strong></p>
+<p>这是 Windows 自带的 SmartScreen 拦截。点击窗口里的 <strong>“更多信息”</strong>，下面会多出一个 <strong>“仍要运行”</strong> 按钮，点它就能启动。</p>
+<p><strong>② 浏览器提示“不常下载，可能不安全”</strong></p>
+<p>在浏览器的下载列表里找到刚下载的压缩包，选择 <strong>“保留”</strong>（Edge 里是“仍然保留”）。</p>
+<p><strong>③ 杀毒软件报毒，或文件已被隔离 / 删除</strong></p>
+<p>先把文件恢复出来：</p>
+<ul>
+<li>打开 <strong>Windows 安全中心 → 病毒和威胁防护 → 保护历史记录</strong>，找到被处理的 <code>AgentCore-Light.exe</code>，点 <strong>“操作”</strong>，选择“允许”或“还原”。</li>
+</ul>
+<p>再把它加入信任列表，避免以后每次都被拦：</p>
+<ul>
+<li><strong>Windows 安全中心 → 病毒和威胁防护 → “病毒和威胁防护设置”下的“管理设置” → 拉到底部“排除项” → “添加或删除排除项” → “添加” → “文件”</strong>，选中 <code>AgentCore-Light.exe</code>。</li>
+<li><strong>第三方杀毒软件</strong>（360 安全卫士、火绒、腾讯电脑管家等）：在“信任区 / 白名单 / 排除项”里添加这个文件，或对报警弹窗选择“恢复并信任”。</li>
+</ul>
+<div class="callout callout-tip" data-reveal><p>建议在下载完成后、第一次运行之前，就先把 <code>AgentCore-Light.exe</code> 加进杀毒软件的信任列表，可以省掉后面反复被拦的麻烦。</p></div>
+<p><strong>运行之后还是不放心？</strong></p>
+<ul>
+<li>可以把 <code>AgentCore-Light.exe</code> 上传到 <a href="https://www.virustotal.com/">https://www.virustotal.com/</a>，让七十多家杀毒引擎同时扫描。未签名的个人软件常有一两家误报，<strong>只要不是大面积报毒，就属于误报</strong>。</li>
+<li>想确认软件的联网行为，可以在控制台里看事件流：它只和你通过 USB 或蓝牙连接的设备通信。</li>
+</ul>
+<h3 id="2-3-开机"><a class="anchor" href="#2-3-开机" aria-label="本节链接">#</a>2.3 开机</h3>
+<ol>
+<li>长按设备按键约 <strong>3 秒</strong>。</li>
+<li>到达开机时间后，设备会立即显示开机灯效；</li>
+<li>开机后默认进入<strong>蓝牙模式</strong>，红灯闪烁表示正在等待电脑连接。</li>
+</ol>
+<h3 id="2-4-关机"><a class="anchor" href="#2-4-关机" aria-label="本节链接">#</a>2.4 关机</h3>
+<p>长按设备按键约 <strong>3 秒</strong>。达到时间后，设备会立即关闭状态灯并进入低功耗关机状态。</p>
+<blockquote><p>插入 USB 用于充电或 USB 通信，不会自动开机。需要使用设备时，仍需长按按键 3 秒开机。</p></blockquote>
+<h2 id="3-使用蓝牙连接-推荐日常无线使用"><a class="anchor" href="#3-使用蓝牙连接-推荐日常无线使用" aria-label="本节链接">#</a>3. 使用蓝牙连接（推荐日常无线使用）</h2>
+<p>蓝牙模式适合设备放在桌面上、希望减少线缆的场景。</p>
+<h3 id="3-1-在-windows-中配对"><a class="anchor" href="#3-1-在-windows-中配对" aria-label="本节链接">#</a>3.1 在 Windows 中配对</h3>
+<ol>
+<li>开机后确认设备红灯正在闪烁。</li>
+<li>打开 Windows：<strong>设置 → 蓝牙和设备 → 添加设备 → 蓝牙</strong>。</li>
+<li>在列表中选择 <strong><code>AgentCore-Light</code></strong>。</li>
+<li>按 Windows 提示完成配对。</li>
+<li>在设备详情页点击<strong>连接</strong>，直到 Windows 显示已连接。</li>
+<li>设备绿灯呼吸，表示蓝牙业务连接已准备就绪。</li>
+</ol>
+<p>首次配对完成后，后续通常无需重复配对。</p>
+<h3 id="3-2-在-agentcore-light-中连接"><a class="anchor" href="#3-2-在-agentcore-light-中连接" aria-label="本节链接">#</a>3.2 在 AgentCore-Light 中连接</h3>
+<ol>
+<li>双击运行 <code>AgentCore-Light.exe</code>。</li>
+<li>会自动跳转到浏览器配置页面，如果没有跳转，可自行进入配置网页http://127.0.0.1:18793/。</li>
+<li>点击<strong>启动蓝牙模式</strong>。</li>
+<li>等待软件显示设备已连接。</li>
+</ol>
+<blockquote><p>蓝牙模式下，Windows 可能把设备显示为音频设备。这是为了让 Windows 稳定管理经典蓝牙连接；实际的灯光和蜂鸣器控制由蓝牙数据通道完成，不会播放电脑声音。</p></blockquote>
+<h2 id="4-使用-usb-串口连接"><a class="anchor" href="#4-使用-usb-串口连接" aria-label="本节链接">#</a>4. 使用 USB 串口连接</h2>
+<p>USB 串口模式适合希望使用有线连接、无需电脑蓝牙的场景。</p>
+<h3 id="4-1-切换到-usb-模式"><a class="anchor" href="#4-1-切换到-usb-模式" aria-label="本节链接">#</a>4.1 切换到 USB 模式</h3>
+<ol>
+<li>确保设备已经开机。</li>
+<li><strong>短按一次</strong>设备按键。</li>
+<li>黄灯开始闪烁，表示设备已切换到 USB 串口模式，正在等待电脑软件连接。</li>
+</ol>
+<h3 id="4-2-在电脑上连接"><a class="anchor" href="#4-2-在电脑上连接" aria-label="本节链接">#</a>4.2 在电脑上连接</h3>
+<ol>
+<li>用支持数据传输的 Type-C 数据线连接设备和电脑。</li>
+<li>打开 <code>AgentCore-Light.exe</code>。</li>
+<li>会自动跳转到浏览器配置页面，如果没有跳转，可自行进入配置网页http://127.0.0.1:18793/。</li>
+<li>点击<strong>启动 USB 串口模式</strong>。</li>
+<li>等待软件连接成功；设备绿灯呼吸即表示可以使用。</li>
+</ol>
+<p>如果软件停止 USB 串口服务，设备会自动回到黄灯闪烁状态，等待下一次连接。</p>
+<h2 id="5-在两种连接方式之间切换"><a class="anchor" href="#5-在两种连接方式之间切换" aria-label="本节链接">#</a>5. 在两种连接方式之间切换</h2>
+<p>设备开机后默认蓝牙模式。每次<strong>短按一次按键</strong>即可在两种模式之间切换：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>蓝牙模式（红灯闪烁）
+        ⇅ 短按按键
+USB 串口模式（黄灯闪烁）</code></pre></div>
+<p>切换模式时，设备会关闭另一种通信方式，以减少功耗并避免电脑同时连接两种通道造成混乱。</p>
+<blockquote><p>软件中点击“启动蓝牙模式”或“启动 USB 串口模式”时，也会自动关闭另一种软件连接方式。</p></blockquote>
+<h2 id="6-软件基础操作"><a class="anchor" href="#6-软件基础操作" aria-label="本节链接">#</a>6. 软件基础操作</h2>
+<p>设备连接成功后，可在 AgentCore-Light 控制台完成以下操作。</p>
+<h3 id="6-1-手动测试灯光"><a class="anchor" href="#6-1-手动测试灯光" aria-label="本节链接">#</a>6.1 手动测试灯光</h3>
+<p>在“灯光控制”区域可直接测试红灯、黄灯、绿灯的点亮或闪烁效果，也可执行全部熄灭、全部点亮等测试。</p>
+<h3 id="6-2-调整亮度"><a class="anchor" href="#6-2-调整亮度" aria-label="本节链接">#</a>6.2 调整亮度</h3>
+<p>设备默认灯光亮度为 <strong>30%</strong>，兼顾桌面观感和续航。</p>
+<p>如需更亮：</p>
+<ol>
+<li>在控制台找到“亮度”滑块。</li>
+<li>向右拖动提高亮度，向左拖动降低亮度。</li>
+<li>松开滑块后，设置会立即发送给设备并保存在本机；下次软件启动或设备重新连接时会自动恢复。</li>
+</ol>
+<h3 id="6-3-蜂鸣器"><a class="anchor" href="#6-3-蜂鸣器" aria-label="本节链接">#</a>6.3 蜂鸣器</h3>
+<p>可在控制台中开启或关闭蜂鸣器，并调节音量。建议在安静环境中先使用较低音量进行测试。</p>
+<h3 id="6-4-电池电量"><a class="anchor" href="#6-4-电池电量" aria-label="本节链接">#</a>6.4 电池电量</h3>
+<p>设备连接后，控制台会显示：</p>
+<ul>
+<li>当前电量百分比；</li>
+<li>电池电压；</li>
+<li>当前是否接入 USB；</li>
+<li>最近一次状态更新时间。</li>
+</ul>
+<p>插入 USB 时：未充满会点亮充电指示灯；电量充满后点亮完成指示灯。拔掉 USB 后，两颗充电相关指示灯会自动熄灭。</p>
+<h3 id="6-5-退出软件"><a class="anchor" href="#6-5-退出软件" aria-label="本节链接">#</a>6.5 退出软件</h3>
+<p>想彻底关掉软件（比如要让这台电脑不再跟随 AI 工具点灯），有两种方式，任选一种：</p>
+<ol>
+<li><strong>在控制台里退出（推荐）</strong>：点右上角的「退出」按钮，确认一下就行。界面和后台服务都会停下来，浏览器里的控制台页面可以直接关掉。</li>
+<li><strong>双击退出脚本</strong>：在软件所在文件夹（或卖家给的软件包里）双击 <code>退出AgentCore-Light.cmd</code>。控制台打不开、或者找不到退出按钮时用这条。</li>
+</ol>
+<p>两种方式都<strong>不会</strong>关掉开机自启：以后开机还是会自动启动。想连开机自启也关掉，请在控制台顶栏关闭「开机自启」。</p>
+<p>想再用时，双击桌面上的 AgentCore-Light 图标即可。</p>
+<h2 id="7-连接-ai-工具"><a class="anchor" href="#7-连接-ai-工具" aria-label="本节链接">#</a>7. 连接 AI 工具</h2>
+<p>如需让 AI 工作状态自动显示在设备上：</p>
+<ol>
+<li>先按照第 3 或第 4 章完成设备连接，确认设备绿灯呼吸。</li>
+<li>在软件中打开<strong>连接 AI 工具</strong>。</li>
+<li>按页面提示选择并安装需要使用的 AI 工具连接。</li>
+<li>按提示重启对应 AI 工具或新建会话。</li>
+<li>AI 工具开始工作后，设备会自动显示对应灯效；例如工作中、完成、报错或等待确认。</li>
+</ol>
+<h3 id="豆包-doubao-的特别说明"><a class="anchor" href="#豆包-doubao-的特别说明" aria-label="本节链接">#</a>豆包（Doubao）的特别说明</h3>
+<p>豆包桌面版没有 Hook 可以接，所以用的是<strong>内置监听</strong>：在「连接 AI 工具」里把「豆包（Doubao）」装上就行，<strong>不用重启豆包，也不用额外装任何东西</strong>。</p>
+<p>装好之后正常用豆包：</p>
+<ol>
+<li>你把问题发出去 → 状态灯亮<strong>忙碌</strong>；</li>
+<li>豆包答完 → 状态灯给一次<strong>完成</strong>提示，然后回到待机。</li>
+</ol>
+<p>几点要知道：</p>
+<ul>
+<li>支持 <strong>Windows / macOS 桌面版</strong>豆包，Linux 上豆包的安装方式比较多（部分发行版有原生包，部分走 Wine），同样尝试支持；</li>
+<li>如果装了豆包但灯不亮，把软件的日志发给我们即可——软件每 5 秒会记一行&quot;找没找到豆包日志&quot;，一眼就能看出问题在哪；</li>
+<li>判定方式是读豆包自己写的运行日志里两条&quot;请求记录&quot;（发问题、答完各一条），<strong>不截屏、不读聊天内容、不监听键盘</strong>；判断全在本机完成；</li>
+<li>豆包最小化或者被别的窗口挡住都没关系，答案出来照样会亮；发完就把豆包最小化去做别的事也完全可以；</li>
+<li>目前只识别&quot;发出问题&quot;和&quot;回答完成&quot;两个节点，豆包要求你确认之类的中间状态不单独上报；</li>
+<li>如果豆包大版本更新后识别失效，联系我们更新软件即可（软件里也留了自检日志，能一眼看出是豆包改版了）。</li>
+</ul>
+<h3 id="设备状态灯效对照"><a class="anchor" href="#设备状态灯效对照" aria-label="本节链接">#</a>设备状态灯效对照</h3>
+<p>AI 工具工作时，设备会自动按下面的方式显示当前状态：</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>状态</th><th>灯效</th><th>说明</th></tr><tr><td>空闲 IDLE</td><td><span class="chip chip-green chip-breathe">绿灯呼吸</span></td><td>没有任务在跑；连续空闲会自动熄灯休眠</td></tr><tr><td>工作 BUSY</td><td><span class="chip chip-yellow chip-blink">黄灯慢闪</span></td><td>正在调用工具或执行任务，约 1 秒闪一次</td></tr><tr><td>等待确认 WAIT_CONFIRM</td><td><span class="chip chip-yellow">黄灯常亮</span></td><td>需要你授权或确认</td></tr><tr><td>报错 ERROR</td><td><span class="chip chip-red chip-blink chip-blink-fast">红灯快闪</span></td><td>任务失败或出错</td></tr><tr><td>任务完成 SUCCESS</td><td><span class="chip chip-green chip-breathe">绿灯呼吸</span></td><td>任务成功时绿灯呼吸并响「上行提示」音，5 秒后回到空闲</td></tr></tbody></table></div>
+<blockquote><p>灯光亮度可在控制台调整（默认 30%）；蜂鸣器可以整体关闭，也可以单独调整音量。连续空闲 10 分钟会自动熄灯休眠，蓝牙断连 5 分钟自动关机，详见第 8 章。</p></blockquote>
+<p>如果暂时不需要 AI 自动联动，也可以只使用软件的手动灯光和蜂鸣器控制功能。</p>
+<h2 id="8-待机-休眠与自动关机"><a class="anchor" href="#8-待机-休眠与自动关机" aria-label="本节链接">#</a>8. 待机、休眠与自动关机</h2>
+<h3 id="8-1-空闲时的呼吸灯"><a class="anchor" href="#8-1-空闲时的呼吸灯" aria-label="本节链接">#</a>8.1 空闲时的呼吸灯</h3>
+<p>连接 AI 工具后，灯光会交给软件接管：没有任务在跑时，绿灯以<strong>低亮度呼吸</strong>显示，比正常工作亮度暗一些，也是省电设计。刚建立连接、软件还没接管灯光时，绿灯同样是呼吸显示——看到绿灯在缓慢地一亮一暗，就表示连接已经就绪。</p>
+<h3 id="8-2-连续空闲自动熄灯-休眠"><a class="anchor" href="#8-2-连续空闲自动熄灯-休眠" aria-label="本节链接">#</a>8.2 连续空闲自动熄灯（休眠）</h3>
+<p>连续空闲 <strong>10 分钟</strong>（默认）后，设备会熄灭全部状态灯、进入休眠，进一步省电。休眠期间连接保持不断；AI 工具有新任务时，灯会<strong>自动亮回来，不需要按任何按键</strong>。</p>
+<h3 id="8-3-蓝牙断连自动关机"><a class="anchor" href="#8-3-蓝牙断连自动关机" aria-label="本节链接">#</a>8.3 蓝牙断连自动关机</h3>
+<p>蓝牙模式下，如果连续 <strong>5 分钟</strong>没有连接（例如电脑关机、蓝牙关闭或软件退出），设备会<strong>自动关机</strong>；<strong>插着 USB 充电时同样会</strong>进入关机状态。需要使用时，长按按键约 3 秒重新开机。</p>
+<div class="callout callout-tip" data-reveal><p>上面两个时间都可以调整：空闲熄灯默认 10 分钟、断连关机默认 5 分钟，范围都是 0～3600 秒，设为 0 表示关闭对应的自动动作。开发者可通过 API 命令 <code>IDLE_SLEEP_SEC:</code>、<code>BT_DISCONNECT_OFF_SEC:</code> 修改（见 API 调用手册第 15 节）；普通用户如需修改，请联系售后。</p></div>
+<h3 id="8-4-充电与续航建议"><a class="anchor" href="#8-4-充电与续航建议" aria-label="本节链接">#</a>8.4 充电与续航建议</h3>
+<ul>
+<li>可使用常规 USB 电源为设备充电。</li>
+<li>不使用设备时，长按按键关机，以获得更低待机功耗。</li>
+<li>长时间不用时，建议每隔一段时间补充电量，避免电池长期过度放电。</li>
+</ul>
+<h2 id="9-常见问题"><a class="anchor" href="#9-常见问题" aria-label="本节链接">#</a>9. 常见问题</h2>
+<h3 id="杀毒软件说这个软件是病毒"><a class="anchor" href="#杀毒软件说这个软件是病毒" aria-label="本节链接">#</a>杀毒软件说这个软件是病毒</h3>
+<p>几乎都是误报。AgentCore-Light 没有购买代码签名证书，新版本下载量又少，容易被“宁可错杀”的规则拦下。软件只在本机运行、不向外部发送数据，具体说明和处理步骤见 <strong>2.2 系统提示“不安全”怎么办</strong>。</p>
+<h3 id="按住按键后设备没有开机"><a class="anchor" href="#按住按键后设备没有开机" aria-label="本节链接">#</a>按住按键后设备没有开机</h3>
+<ul>
+<li>请确认按键持续按住约 3 秒。</li>
+<li>请先为设备充电后再试。</li>
+<li>USB 接入不会自动开机，仍需长按按键。</li>
+</ul>
+<h3 id="蓝牙模式一直红灯闪烁"><a class="anchor" href="#蓝牙模式一直红灯闪烁" aria-label="本节链接">#</a>蓝牙模式一直红灯闪烁</h3>
+<ul>
+<li>确认 Windows 蓝牙已打开。</li>
+<li>首次使用请先在 Windows 设置中配对 <code>AgentCore-Light</code>。</li>
+<li>配对后请在 Windows 设备详情页点击“连接”。</li>
+<li>再回到 AgentCore-Light 的蓝牙页面启动蓝牙模式。</li>
+</ul>
+<h3 id="usb-模式一直黄灯闪烁"><a class="anchor" href="#usb-模式一直黄灯闪烁" aria-label="本节链接">#</a>USB 模式一直黄灯闪烁</h3>
+<ul>
+<li>确认已短按按键切换到 USB 模式。</li>
+<li>更换为支持数据传输的 Type-C 数据线。</li>
+<li>确认 AgentCore-Light 的 USB 串口页面已点击“启动 USB 串口模式”。</li>
+</ul>
+<h3 id="软件显示连接成功-但灯光没有变化"><a class="anchor" href="#软件显示连接成功-但灯光没有变化" aria-label="本节链接">#</a>软件显示连接成功，但灯光没有变化</h3>
+<ul>
+<li>确认设备绿灯呼吸。</li>
+<li>在“灯光控制”中先测试红、黄、绿灯。</li>
+<li>确认亮度滑块未设置为 0%。</li>
+<li>尝试关闭并重新启动对应的蓝牙或 USB 串口模式。</li>
+</ul>
+<h3 id="蓝牙和-usb-能否同时使用"><a class="anchor" href="#蓝牙和-usb-能否同时使用" aria-label="本节链接">#</a>蓝牙和 USB 能否同时使用？</h3>
+<p>不能。设备一次只启用一种通信模式；这是为了降低功耗并保持连接稳定。短按设备按键即可切换。</p>
+<h3 id="设备外壳上有灰尘或指纹-是别人用过的吗"><a class="anchor" href="#设备外壳上有灰尘或指纹-是别人用过的吗" aria-label="本节链接">#</a>设备外壳上有灰尘或指纹，是别人用过的吗？</h3>
+<p>不是。每台设备出厂前都经过组装和完整功能测试（开机、灯效、蜂鸣器、按键），测试、装箱时会接触工作台，外壳上留下少量灰尘或指纹属于正常现象，不影响使用。用包装内附带的<strong>酒精棉片</strong>擦拭一遍即可擦净，功能没有问题。</p>
+<h3 id="空闲一会儿-灯自己灭了"><a class="anchor" href="#空闲一会儿-灯自己灭了" aria-label="本节链接">#</a>空闲一会儿，灯自己灭了</h3>
+<p>不是故障：连续空闲 10 分钟设备会自动熄灯休眠，连接并没有断开，AI 工具有新任务时会自动亮回来，不需要按任何按键。详见 <strong>8.2 连续空闲自动熄灯（休眠）</strong>。</p>
+<h3 id="设备自己关机了"><a class="anchor" href="#设备自己关机了" aria-label="本节链接">#</a>设备自己关机了</h3>
+<p>蓝牙模式下连续 5 分钟没有连接（电脑关机、蓝牙关闭或软件退出），设备会自动关机，插着 USB 充电时也一样。长按按键约 3 秒即可重新开机。详见 <strong>8.3 蓝牙断连自动关机</strong>。</p>
+<h2 id="10-使用注意事项"><a class="anchor" href="#10-使用注意事项" aria-label="本节链接">#</a>10. 使用注意事项</h2>
+<ul>
+<li>请勿自行拆开设备、短接接口或使用不匹配的电源。</li>
+<li>请避免在潮湿、高温或易燃环境中使用和充电。</li>
+<li>仅使用正常的 USB 供电设备和合格数据线。</li>
+<li>固件升级、维修或异常排查请联系售后，不建议客户自行操作。</li>
+</ul>
+      </article>
+    </div>
+  </main>
+
+  <button class="to-top" id="toTop" type="button" aria-label="返回顶部">↑</button>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>AgentCore-Light · 客户使用手册</span>
+      <span class="footer-shop">官方店铺：<a href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener">AgentCore-Light 淘宝店 ↗</a></span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+  </script>
+  <script src="site.js" defer></script>
+</body>
+</html>

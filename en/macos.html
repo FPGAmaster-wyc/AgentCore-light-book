@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentCore-Light macOS User Manual</title>
+  <meta name="description" content="Install the app, then connect over Bluetooth or USB">
+  <meta name="theme-color" content="#f3f6f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1517" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="canonical" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/macos.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/macos.html">
+  <link rel="alternate" hreflang="en" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/macos.html">
+  <link rel="alternate" hreflang="x-default" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/macos.html">
+  <link rel="stylesheet" href="../style.css">
+  <script>
+    // 尽早套用上次选择的主题，避免刷新时闪白
+    try {
+      var savedTheme = localStorage.getItem('agentcore-manual-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (error) {}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header site-header--dense">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>AgentCore-Light<small>User Manual</small></span>
+      </a>
+      <div class="header-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <nav class="header-nav" aria-label="Manual navigation">
+        <a class="tab" href="windows.html">Windows</a>
+        <a class="tab active" href="macos.html" aria-current="page">macOS</a>
+        <a class="tab" href="linux.html">Linux</a>
+        <a class="tab" href="api.html">API Manual</a>
+        <a class="tab tab-shop" href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener" title="Official store · Support and accessories">Official store</a>
+        <a class="tab tab-lang" href="../macos.html" hreflang="zh-CN" lang="zh" title="切换到中文" data-lang="zh">中文</a>
+        <button class="icon-btn" id="printBtn" type="button" aria-label="Print or save as PDF" title="Print / Save as PDF">🖨️</button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch light / dark theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap layout" id="content">
+    <aside class="toc-side">
+      <nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol><li class="lvl-2"><a href="#download-panel">Download the app</a></li><li class="lvl-2"><a href="#1-status-at-a-glance">1. Status at a glance</a></li><li class="lvl-2"><a href="#2-installing-the-macos-app">2. Installing the macOS app</a><ol><li class="lvl-3"><a href="#2-1-installing-the-app">2.1 Installing the app</a></li><li class="lvl-3"><a href="#2-2-what-to-do-when-macos-says-cannot-verify-the-developer">2.2 What to do when macOS says “Cannot verify the developer”</a></li></ol></li><li class="lvl-2"><a href="#3-powering-on-powering-off-and-switching-modes">3. Powering on, powering off and switching modes</a><ol><li class="lvl-3"><a href="#powering-on-and-off">Powering on and off</a></li><li class="lvl-3"><a href="#switching-connection-modes">Switching connection modes</a></li></ol></li><li class="lvl-2"><a href="#4-connecting-over-bluetooth">4. Connecting over Bluetooth</a></li><li class="lvl-2"><a href="#5-connecting-over-usb-serial">5. Connecting over USB serial</a></li><li class="lvl-2"><a href="#6-using-the-console">6. Using the console</a></li><li class="lvl-2"><a href="#7-connecting-your-ai-tools">7. Connecting your AI tools</a><ol><li class="lvl-3"><a href="#status-light-reference">Status light reference</a></li></ol></li><li class="lvl-2"><a href="#8-standby-sleep-and-auto-power-off">8. Standby, sleep and auto power-off</a><ol><li class="lvl-3"><a href="#8-1-the-idle-breathing-light">8.1 The idle breathing light</a></li><li class="lvl-3"><a href="#8-2-going-to-sleep-after-a-while-idle">8.2 Going to sleep after a while idle</a></li><li class="lvl-3"><a href="#8-3-auto-power-off-when-bluetooth-drops">8.3 Auto power-off when Bluetooth drops</a></li><li class="lvl-3"><a href="#8-4-charging-and-battery-life">8.4 Charging and battery life</a></li></ol></li><li class="lvl-2"><a href="#9-troubleshooting">9. Troubleshooting</a><ol><li class="lvl-3"><a href="#it-says-rosetta-needs-to-be-installed">It says “Rosetta needs to be installed”</a></li><li class="lvl-3"><a href="#the-app-will-not-open">The app will not open</a></li><li class="lvl-3"><a href="#bluetooth-mode-keeps-blinking-red">Bluetooth mode keeps blinking red</a></li><li class="lvl-3"><a href="#usb-mode-keeps-blinking-yellow">USB mode keeps blinking yellow</a></li><li class="lvl-3"><a href="#the-light-does-not-change">The light does not change</a></li><li class="lvl-3"><a href="#there-is-dust-or-a-fingerprint-on-the-shell-has-it-been-used">There is dust or a fingerprint on the shell — has it been used?</a></li><li class="lvl-3"><a href="#after-a-while-idle-the-light-goes-out-by-itself">After a while idle the light goes out by itself</a></li><li class="lvl-3"><a href="#the-device-powered-itself-off">The device powered itself off</a></li></ol></li><li class="lvl-2"><a href="#10-precautions">10. Precautions</a></li></ol></nav>
+    </aside>
+
+    <div>
+      <details class="toc-mobile">
+        <summary>On this page</summary>
+        <nav class="toc" aria-label="On this page"><p class="toc-title">On this page</p><ol><li class="lvl-2"><a href="#download-panel">Download the app</a></li><li class="lvl-2"><a href="#1-status-at-a-glance">1. Status at a glance</a></li><li class="lvl-2"><a href="#2-installing-the-macos-app">2. Installing the macOS app</a><ol><li class="lvl-3"><a href="#2-1-installing-the-app">2.1 Installing the app</a></li><li class="lvl-3"><a href="#2-2-what-to-do-when-macos-says-cannot-verify-the-developer">2.2 What to do when macOS says “Cannot verify the developer”</a></li></ol></li><li class="lvl-2"><a href="#3-powering-on-powering-off-and-switching-modes">3. Powering on, powering off and switching modes</a><ol><li class="lvl-3"><a href="#powering-on-and-off">Powering on and off</a></li><li class="lvl-3"><a href="#switching-connection-modes">Switching connection modes</a></li></ol></li><li class="lvl-2"><a href="#4-connecting-over-bluetooth">4. Connecting over Bluetooth</a></li><li class="lvl-2"><a href="#5-connecting-over-usb-serial">5. Connecting over USB serial</a></li><li class="lvl-2"><a href="#6-using-the-console">6. Using the console</a></li><li class="lvl-2"><a href="#7-connecting-your-ai-tools">7. Connecting your AI tools</a><ol><li class="lvl-3"><a href="#status-light-reference">Status light reference</a></li></ol></li><li class="lvl-2"><a href="#8-standby-sleep-and-auto-power-off">8. Standby, sleep and auto power-off</a><ol><li class="lvl-3"><a href="#8-1-the-idle-breathing-light">8.1 The idle breathing light</a></li><li class="lvl-3"><a href="#8-2-going-to-sleep-after-a-while-idle">8.2 Going to sleep after a while idle</a></li><li class="lvl-3"><a href="#8-3-auto-power-off-when-bluetooth-drops">8.3 Auto power-off when Bluetooth drops</a></li><li class="lvl-3"><a href="#8-4-charging-and-battery-life">8.4 Charging and battery life</a></li></ol></li><li class="lvl-2"><a href="#9-troubleshooting">9. Troubleshooting</a><ol><li class="lvl-3"><a href="#it-says-rosetta-needs-to-be-installed">It says “Rosetta needs to be installed”</a></li><li class="lvl-3"><a href="#the-app-will-not-open">The app will not open</a></li><li class="lvl-3"><a href="#bluetooth-mode-keeps-blinking-red">Bluetooth mode keeps blinking red</a></li><li class="lvl-3"><a href="#usb-mode-keeps-blinking-yellow">USB mode keeps blinking yellow</a></li><li class="lvl-3"><a href="#the-light-does-not-change">The light does not change</a></li><li class="lvl-3"><a href="#there-is-dust-or-a-fingerprint-on-the-shell-has-it-been-used">There is dust or a fingerprint on the shell — has it been used?</a></li><li class="lvl-3"><a href="#after-a-while-idle-the-light-goes-out-by-itself">After a while idle the light goes out by itself</a></li><li class="lvl-3"><a href="#the-device-powered-itself-off">The device powered itself off</a></li></ol></li><li class="lvl-2"><a href="#10-precautions">10. Precautions</a></li></ol></nav>
+      </details>
+      <article class="guide-content">
+<h1 id="agentcore-light-user-manual-macos">AgentCore-Light User Manual (macOS)</h1>
+<section class="download-panel" id="download-panel" data-reveal><div class="download-panel-copy"><span class="download-panel-kicker">Step 1 · Download the app</span><h2>Download the macOS app</h2><p>For every Mac (Intel and Apple silicon alike). Unzip the download, then drag <code>AgentCore-Light.app</code> into your Applications folder.</p></div><div class="download-panel-actions"><div class="download-item"><a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light-mac.zip" download>Download for macOS <span>↓</span></a><p class="download-version">Version v2.1.2</p></div></div></section>
+<aside class="download-note" data-reveal><p class="download-note-title">Blocked by your system the first time?</p><p class="download-note-intro">The app is not enrolled in the Apple Developer Program and is not notarized, so macOS saying it “cannot verify the developer” is normal — <strong>it is not a virus</strong>.</p><ul><li><strong>“Cannot verify the developer”, or “Apple could not verify…”</strong> → System Settings → Privacy &amp; Security → click “Open Anyway”</li><li><strong>“is damaged and can’t be opened. You should move it to the Trash.”</strong> → Open Terminal and run:<br><code>xattr -dr com.apple.quarantine /Applications/AgentCore-Light.app</code></li><li><strong>Double-clicking does nothing</strong> → Make sure you dragged the app into Applications rather than running it inside the unzipped folder</li></ul><a class="download-note-more" href="#2-2-what-to-do-when-macos-says-cannot-verify-the-developer">Read the details → 2.2 What to do when macOS says “Cannot verify the developer”</a></aside>
+<div class="meta" data-reveal><p>Applies to product: AgentCore-Light desktop status light</p><p>Applies to software: AgentCore-Light macOS app</p></div>
+<div class="callout callout-important" data-reveal><p><strong>The magnetic plate, and returns</strong></p><p>A magnetic plate is included so you can mount the device wherever it suits you. Please power it on and test everything first — power, connection, lights, buzzer — before you decide where to stick it. <strong>Once the backing is peeled off the magnetic plate and it is attached, the item can no longer be returned under our no-questions-asked policy.</strong> If anything seems wrong with the device, do not peel it — contact us first.</p></div>
+<div class="callout callout-note" data-reveal><p><strong>An alcohol wipe is included</strong></p><p>The device is handled on the workbench during assembly and testing, so a little dust or a fingerprint on the shell is normal — one wipe with the alcohol pad in the box clears it. <strong>Every unit is fully function-tested before it leaves the factory</strong>: lights, buzzer and button are all confirmed working. There is nothing wrong with your unit.</p></div>
+<p>AgentCore-Light shows what your computer or your AI tools are doing through three coloured lights and a buzzer. On a Mac you can connect over Bluetooth with no cable, or over a USB cable.</p>
+<h2 id="1-status-at-a-glance"><a class="anchor" href="#1-status-at-a-glance" aria-label="Link to this section">#</a>1. Status at a glance</h2>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>Light</th><th>Meaning</th><th>What to do</th></tr><tr><td><span class="chip chip-all">All LEDs flash</span></td><td>The device is powering on</td><td>Wait for it to enter a connection mode</td></tr><tr><td><span class="chip chip-red chip-blink">Red blinking</span></td><td>Bluetooth mode, waiting for the Mac to connect</td><td>Start Bluetooth mode in AgentCore-Light</td></tr><tr><td><span class="chip chip-yellow chip-blink">Yellow blinking</span></td><td>USB serial mode, waiting for the app on your Mac to connect</td><td>Plug in the USB cable and select Start USB mode in the app</td></tr><tr><td><span class="chip chip-green chip-breathe">Green breathing</span></td><td>The current connection is up; the device is idle and standing by</td><td>You can start using the app or your AI tools</td></tr><tr><td><span class="chip chip-off">All LEDs off</span></td><td>The device is powered off</td><td>Press and hold the button for 3 seconds to power on</td></tr></tbody></table></div>
+<blockquote><p>“Green breathing” means the green light fading slowly up and down. It means the device is connected and standing by — it is not blinking, and it is not a fault.</p></blockquote>
+<h2 id="2-installing-the-macos-app"><a class="anchor" href="#2-installing-the-macos-app" aria-label="Link to this section">#</a>2. Installing the macOS app</h2>
+<h3 id="2-1-installing-the-app"><a class="anchor" href="#2-1-installing-the-app" aria-label="Link to this section">#</a>2.1 Installing the app</h3>
+<p>The installer works on both Intel and Apple silicon Macs, so there is no need to work out which chip yours has:</p>
+<ol>
+<li>Unzip the downloaded <code>AgentCore-Light-mac.zip</code>.</li>
+<li>Drag the extracted <code>AgentCore-Light.app</code> into your <strong>Applications</strong> folder.</li>
+<li>The first time you run it, hold down <strong>Control</strong> and click <code>AgentCore-Light.app</code> in Applications, then choose <strong>Open</strong>.</li>
+<li>When the app starts it opens the browser console automatically; if it does not, open <a href="http://127.0.0.1:18793/">http://127.0.0.1:18793/</a> in your browser.</li>
+</ol>
+<blockquote><p>Keep the app in your Applications folder. That way start-at-sign-in, AI tool connections and online updates all work properly.</p></blockquote>
+<div class="callout callout-important" data-reveal><p><strong>Switch the app to English first.</strong> The app starts up in Chinese. Open <strong>Settings</strong> (top right) → <strong>Language</strong> → <strong>English</strong>. Every button name in this manual is the one you will see after that — for example <strong>Start Bluetooth mode</strong> and <strong>Start USB mode</strong>. Your choice is remembered on this computer.</p></div>
+<div class="callout callout-important" data-reveal><p>The first time you open it, macOS will most likely refuse to run it, saying “Cannot verify the developer”, or that the app “is damaged and can’t be opened”. <strong>This is normal for unsigned software — the app is not at fault.</strong> See the next section, <strong>2.2</strong>, for what to do.</p></div>
+<div class="callout callout-note" data-reveal><p>The first time you open it on an Apple silicon Mac (M1 / M2 / M3 / M4), macOS may ask you to install <strong>Rosetta</strong>, its compatibility layer for running Intel software. Click <strong>Install</strong>, follow the prompts, and everything runs normally from then on.</p></div>
+<h3 id="2-2-what-to-do-when-macos-says-cannot-verify-the-developer"><a class="anchor" href="#2-2-what-to-do-when-macos-says-cannot-verify-the-developer" aria-label="Link to this section">#</a>2.2 What to do when macOS says “Cannot verify the developer”</h3>
+<p>AgentCore-Light is made by an independent developer. It has <strong>no Apple Developer Program membership and no notarisation</strong> — both of those cost money every year. So the first time you open it, macOS usually blocks it. <strong>This is caused by the missing signature and notarisation, not by a virus in the app.</strong></p>
+<p><strong>What the app actually does:</strong></p>
+<ul>
+<li>It runs entirely on your own machine. The console page listens on <code>127.0.0.1</code> only, so <strong>only this Mac can open it</strong> — other devices on the same network cannot reach it.</li>
+<li>It sends no data anywhere, apart from checking for software updates.</li>
+<li>Start-at-sign-in is written under <strong>your own user</strong> account, needs no administrator password, and changes neither system settings nor other software.</li>
+</ul>
+<p><strong>What to do, by the kind of prompt you get:</strong></p>
+<p><strong>① “Cannot be opened because Apple cannot check it for malicious software”</strong></p>
+<p>This is Gatekeeper, the check built into macOS. Open <strong>System Settings → Privacy &amp; Security</strong>, scroll down to the <strong>Security</strong> section, where the <code>AgentCore-Light</code> that was just blocked is listed. Click <strong>Open Anyway</strong>, then enter your login password to confirm.</p>
+<p><strong>② “Cannot be opened because the developer cannot be verified”</strong></p>
+<p>The fix is exactly the same as above: <strong>System Settings → Privacy &amp; Security → Open Anyway</strong>.</p>
+<div class="callout callout-tip" data-reveal><p>From macOS 15 (Sequoia) onwards, Apple has removed the “hold Control and click” way of skipping the check; you can only allow the app from <strong>Privacy &amp; Security</strong>. So if step 3 above did not work, come straight here.</p></div>
+<p><strong>③ “AgentCore-Light” is damaged and can’t be opened. You should move it to the Trash.</strong></p>
+<p>That message is the one most likely to make you think the file is broken or infected. In fact it is usually caused by the quarantine flag macOS puts on apps downloaded from the internet — <strong>there is nothing wrong with the app</strong>. Removing the flag is all it takes:</p>
+<ol>
+<li>Open <strong>Finder → Applications → Utilities → Terminal</strong>.</li>
+<li>Paste the command below, press Return, then enter your login password:</li>
+</ol>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">bash</span><button class="copy-btn" type="button">Copy</button></div><pre><code>xattr -dr com.apple.quarantine /Applications/AgentCore-Light.app</code></pre></div>
+<ol>
+<li>Open <code>AgentCore-Light.app</code> again and it will start normally.</li>
+</ol>
+<div class="callout callout-note" data-reveal><p>If the app is not in your Applications folder, change the path at the end of the command to wherever it actually is.</p></div>
+<p><strong>Still not comfortable after running it?</strong></p>
+<p>The app asks for no sensitive permissions at all — no microphone, camera, contacts, location or screen recording. You can check each one for yourself under <strong>System Settings → Privacy &amp; Security</strong>.</p>
+<h2 id="3-powering-on-powering-off-and-switching-modes"><a class="anchor" href="#3-powering-on-powering-off-and-switching-modes" aria-label="Link to this section">#</a>3. Powering on, powering off and switching modes</h2>
+<h3 id="powering-on-and-off"><a class="anchor" href="#powering-on-and-off" aria-label="Link to this section">#</a>Powering on and off</h3>
+<ul>
+<li><strong>Power on:</strong> press and hold the button on the device for about 3 seconds. When the time is up the device immediately plays its power-on light effect and enters Bluetooth mode by default.</li>
+<li><strong>Power off:</strong> press and hold the button for about 3 seconds. When the time is up all status lights switch off and the device goes into a low-power state.</li>
+<li>Plugging in USB is only for charging or USB communication — it does <strong>not</strong> power the device on.</li>
+</ul>
+<h3 id="switching-connection-modes"><a class="anchor" href="#switching-connection-modes" aria-label="Link to this section">#</a>Switching connection modes</h3>
+<p>The device is in Bluetooth mode by default after powering on. A single short press of the button switches between the two:</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">Copy</button></div><pre><code>Bluetooth mode (red blinking)
+        ⇅ short press
+USB serial mode (yellow blinking)</code></pre></div>
+<p>The device uses one connection at a time, so that it draws less power and avoids connection conflicts.</p>
+<h2 id="4-connecting-over-bluetooth"><a class="anchor" href="#4-connecting-over-bluetooth" aria-label="Link to this section">#</a>4. Connecting over Bluetooth</h2>
+<ol>
+<li>After powering on, check that the device’s red light is blinking.</li>
+<li>Check that Bluetooth is switched on in macOS System Settings.</li>
+<li>Open <code>AgentCore-Light.app</code> and go to the browser console.</li>
+<li>Click <strong>Start Bluetooth mode</strong>.</li>
+<li>Wait for the app to find and connect to the device; green breathing means the connection is up.</li>
+</ol>
+<blockquote><p>macOS Bluetooth is scanned and connected by AgentCore-Light itself. Normally you do not need to add the device by hand in the macOS Bluetooth device list. If the app cannot find the device, first check that it is showing red blinking, then start Bluetooth mode again.</p></blockquote>
+<h2 id="5-connecting-over-usb-serial"><a class="anchor" href="#5-connecting-over-usb-serial" aria-label="Link to this section">#</a>5. Connecting over USB serial</h2>
+<ol>
+<li>Make sure the device is powered on.</li>
+<li>Short-press the button once and check that the yellow light is blinking.</li>
+<li>Connect the device to your Mac with a Type-C cable that supports data transfer.</li>
+<li>Open the AgentCore-Light console and click <strong>Start USB mode</strong>.</li>
+<li>Wait for the app to connect; green breathing means you are ready to go.</li>
+</ol>
+<p>macOS recognises the device by itself, with no port name to enter by hand. If the app says it cannot find the device, try another Type-C cable that supports data transfer.</p>
+<h2 id="6-using-the-console"><a class="anchor" href="#6-using-the-console" aria-label="Link to this section">#</a>6. Using the console</h2>
+<p>Once the device shows green breathing, you can do the following in the console:</p>
+<ul>
+<li>test the red, yellow and green lights — steady on or blinking;</li>
+<li>adjust the overall light brightness (30% by default);</li>
+<li>switch the buzzer on or off, or set its volume;</li>
+<li>see the battery percentage, battery voltage, USB power status and the time of the last update;</li>
+<li>install the AI tool integrations you need under <strong>Connect AI tools</strong>.</li>
+</ul>
+<p>The brightness slider takes effect as soon as you let go, and is saved on this Mac; it is restored automatically the next time the app starts or the device reconnects.</p>
+<h2 id="7-connecting-your-ai-tools"><a class="anchor" href="#7-connecting-your-ai-tools" aria-label="Link to this section">#</a>7. Connecting your AI tools</h2>
+<ol>
+<li>First connect over Bluetooth or USB, and confirm green breathing.</li>
+<li>In the console, open <strong>Connect AI tools</strong>.</li>
+<li>Select the AI tool you want to connect and follow the prompts on the page to install it.</li>
+<li>Restart the relevant AI tool, or start a new session, as prompted.</li>
+<li>While the AI tool works, the device shows working, done, error or waiting-for-confirmation states on its own.</li>
+</ol>
+<h3 id="status-light-reference"><a class="anchor" href="#status-light-reference" aria-label="Link to this section">#</a>Status light reference</h3>
+<p>While your AI tools work, the device shows the current state like this:</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>State</th><th>Light</th><th>Notes</th></tr><tr><td>Idle IDLE</td><td><span class="chip chip-green chip-breathe">Green breathing</span></td><td>Nothing is running; after a while idle the light goes to sleep</td></tr><tr><td>Working BUSY</td><td><span class="chip chip-yellow chip-blink">Yellow slow blink</span></td><td>A tool call or task is running, about once a second</td></tr><tr><td>Waiting WAIT_CONFIRM</td><td><span class="chip chip-yellow">Yellow steady</span></td><td>The AI needs you to authorise or confirm something</td></tr><tr><td>Error ERROR</td><td><span class="chip chip-red chip-blink chip-blink-fast">Red fast blink</span></td><td>The task failed or hit an error</td></tr><tr><td>Done SUCCESS</td><td><span class="chip chip-green chip-breathe">Green breathing</span></td><td>On success the green light breathes and the “rising” tone plays, then it returns to idle after 5 seconds</td></tr></tbody></table></div>
+<blockquote><p>Brightness can be adjusted in the console (default 30%). The buzzer can be switched off entirely or have its volume set on its own. After 10 minutes continuously idle the light goes to sleep; after 5 minutes with Bluetooth disconnected the device powers off. See chapter 8.</p></blockquote>
+<h2 id="8-standby-sleep-and-auto-power-off"><a class="anchor" href="#8-standby-sleep-and-auto-power-off" aria-label="Link to this section">#</a>8. Standby, sleep and auto power-off</h2>
+<h3 id="8-1-the-idle-breathing-light"><a class="anchor" href="#8-1-the-idle-breathing-light" aria-label="Link to this section">#</a>8.1 The idle breathing light</h3>
+<p>Once an AI tool is connected, the light is handed over to the app: with nothing running, the green light shows <strong>low-brightness breathing</strong>, a little dimmer than the normal working brightness, which is also a power-saving measure. Right after connecting, before the app has taken over the light, the green light breathes in the same way — seeing it fade slowly up and down means the connection is ready.</p>
+<h3 id="8-2-going-to-sleep-after-a-while-idle"><a class="anchor" href="#8-2-going-to-sleep-after-a-while-idle" aria-label="Link to this section">#</a>8.2 Going to sleep after a while idle</h3>
+<p>After <strong>10 minutes</strong> continuously idle (the default), the device turns all status lights off and goes to sleep, saving more power. The connection stays up while it sleeps; when your AI tool has new work the light <strong>comes back on by itself, with no button press needed</strong>.</p>
+<h3 id="8-3-auto-power-off-when-bluetooth-drops"><a class="anchor" href="#8-3-auto-power-off-when-bluetooth-drops" aria-label="Link to this section">#</a>8.3 Auto power-off when Bluetooth drops</h3>
+<p>In Bluetooth mode, if there is no connection for <strong>5 minutes</strong> continuously (the Mac shut down, Bluetooth was switched off, or the app quit), the device <strong>powers itself off</strong>; <strong>this happens even while USB charging is plugged in</strong>. When you want to use it again, press and hold the button for about 3 seconds to power on.</p>
+<div class="callout callout-tip" data-reveal><p>Both of those times can be changed: idle sleep defaults to 10 minutes and disconnect power-off to 5 minutes, both in the range 0–3600 seconds, where 0 turns the automatic action off. Developers can change them with the API commands <code>IDLE_SLEEP_SEC:</code> and <code>BT_DISCONNECT_OFF_SEC:</code> (see section 15 of the API manual); everyone else can contact support.</p></div>
+<h3 id="8-4-charging-and-battery-life"><a class="anchor" href="#8-4-charging-and-battery-life" aria-label="Link to this section">#</a>8.4 Charging and battery life</h3>
+<ul>
+<li>You can charge the device from any ordinary USB power source.</li>
+<li>While USB is connected and the battery is not yet full, the charge indicator is on; once it is full, the full indicator is on.</li>
+<li>On battery power both the charge and full indicators are off — that is the normal power-saving design.</li>
+<li>If you will not be using it for a long time, press and hold the button to power it off.</li>
+</ul>
+<h2 id="9-troubleshooting"><a class="anchor" href="#9-troubleshooting" aria-label="Link to this section">#</a>9. Troubleshooting</h2>
+<h3 id="it-says-rosetta-needs-to-be-installed"><a class="anchor" href="#it-says-rosetta-needs-to-be-installed" aria-label="Link to this section">#</a>It says “Rosetta needs to be installed”</h3>
+<p>The installer works on both kinds of Mac. The first time you open it on an Apple silicon Mac (M1 / M2 / M3 / M4), macOS asks you to install <strong>Rosetta</strong> (its compatibility layer for running Intel software) — click <strong>Install</strong> and follow the prompts, and everything runs normally afterwards. If you click <strong>No</strong> by mistake, double-clicking <code>AgentCore-Light.app</code> again brings the prompt back.</p>
+<h3 id="the-app-will-not-open"><a class="anchor" href="#the-app-will-not-open" aria-label="Link to this section">#</a>The app will not open</h3>
+<p>In almost all cases this is macOS security blocking it — <strong>not a problem with the app</strong>. See <strong>2.2 What to do when macOS says “Cannot verify the developer”</strong> for the full steps. Match the situation below:</p>
+<ul>
+<li><strong>“Cannot verify the developer” or “Apple cannot check it for malicious software”</strong> → open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong> in the Security section.</li>
+<li><strong>“AgentCore-Light” is damaged and can’t be opened. You should move it to the Trash.</strong> → run <code>xattr -dr com.apple.quarantine /Applications/AgentCore-Light.app</code> in Terminal, then open the app again.</li>
+<li><strong>Double-clicking does nothing at all</strong> → check that the app has been dragged into your Applications folder, rather than being run from inside the unzipped folder.</li>
+</ul>
+<h3 id="bluetooth-mode-keeps-blinking-red"><a class="anchor" href="#bluetooth-mode-keeps-blinking-red" aria-label="Link to this section">#</a>Bluetooth mode keeps blinking red</h3>
+<ul>
+<li>Check that Bluetooth is switched on in macOS.</li>
+<li>Check that you have clicked <strong>Start Bluetooth mode</strong> in the console.</li>
+<li>Stop and restart Bluetooth mode, or power the device off and on, and try again.</li>
+</ul>
+<h3 id="usb-mode-keeps-blinking-yellow"><a class="anchor" href="#usb-mode-keeps-blinking-yellow" aria-label="Link to this section">#</a>USB mode keeps blinking yellow</h3>
+<ul>
+<li>Check that you have short-pressed the button to switch to USB serial mode.</li>
+<li>Check that you are using a data cable, not a charge-only cable.</li>
+<li>Unplug and replug the cable, then start USB mode again in the console.</li>
+</ul>
+<h3 id="the-light-does-not-change"><a class="anchor" href="#the-light-does-not-change" aria-label="Link to this section">#</a>The light does not change</h3>
+<ul>
+<li>Check that the device shows green breathing.</li>
+<li>In <strong>Light control</strong>, test any colour first.</li>
+<li>Check that <strong>Brightness</strong> is not set to 0%.</li>
+</ul>
+<h3 id="there-is-dust-or-a-fingerprint-on-the-shell-has-it-been-used"><a class="anchor" href="#there-is-dust-or-a-fingerprint-on-the-shell-has-it-been-used" aria-label="Link to this section">#</a>There is dust or a fingerprint on the shell — has it been used?</h3>
+<p>No. Every unit is assembled and fully function-tested before it leaves the factory (power, light effects, buzzer, button). It is handled on the workbench during testing and packing, so a little dust or a fingerprint on the shell is normal and does not affect anything. One wipe with the <strong>alcohol pad</strong> in the box clears it; the unit works fine.</p>
+<h3 id="after-a-while-idle-the-light-goes-out-by-itself"><a class="anchor" href="#after-a-while-idle-the-light-goes-out-by-itself" aria-label="Link to this section">#</a>After a while idle the light goes out by itself</h3>
+<p>Not a fault: after 10 minutes continuously idle the device turns the lights off and sleeps. The connection is not dropped, and the light comes back by itself when your AI tool has new work — no button press needed. See <strong>8.2 Going to sleep after a while idle</strong>.</p>
+<h3 id="the-device-powered-itself-off"><a class="anchor" href="#the-device-powered-itself-off" aria-label="Link to this section">#</a>The device powered itself off</h3>
+<p>In Bluetooth mode, after 5 minutes with no connection (the Mac shut down, Bluetooth off, or the app quit) the device powers itself off — plugging in USB does not prevent it. Press and hold the button for about 3 seconds to power on again. See <strong>8.3 Auto power-off when Bluetooth drops</strong>.</p>
+<h2 id="10-precautions"><a class="anchor" href="#10-precautions" aria-label="Link to this section">#</a>10. Precautions</h2>
+<ul>
+<li>Do not open the device, short its connectors, or use a power supply that does not match.</li>
+<li>Avoid using or charging it in damp, hot or flammable surroundings.</li>
+<li>For firmware updates, repairs or fault-finding, contact support — we do not recommend customers doing this themselves.</li>
+</ul>
+      </article>
+    </div>
+  </main>
+
+  <button class="to-top" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>AgentCore-Light · User Manual</span>
+      <span class="footer-shop">Official store: <a href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener">AgentCore-Light on Taobao ↗</a></span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+  </script>
+  <script src="../site.js" defer></script>
+</body>
+</html>

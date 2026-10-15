@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentCore-Light macOS 使用手册</title>
+  <meta name="description" content="安装 App、蓝牙或 USB 连接">
+  <meta name="theme-color" content="#f3f6f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1517" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="canonical" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/macos.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/macos.html">
+  <link rel="alternate" hreflang="en" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/macos.html">
+  <link rel="alternate" hreflang="x-default" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/macos.html">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // 尽早套用上次选择的主题，避免刷新时闪白
+    try {
+      var savedTheme = localStorage.getItem('agentcore-manual-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.dataset.theme = savedTheme;
+      }
+    } catch (error) {}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到正文</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header site-header--dense">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>AgentCore-Light<small>客户使用手册</small></span>
+      </a>
+      <div class="header-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <nav class="header-nav" aria-label="手册导航">
+        <a class="tab" href="windows.html">Windows</a>
+        <a class="tab active" href="macos.html" aria-current="page">macOS</a>
+        <a class="tab" href="linux.html">Linux</a>
+        <a class="tab" href="api.html">API调用手册</a>
+        <a class="tab tab-shop" href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener" title="官方店铺 · 售后与配件">官方店铺</a>
+        <a class="tab tab-lang" href="en/macos.html" hreflang="en" lang="en" title="Switch to English" data-lang="en">EN</a>
+        <button class="icon-btn" id="printBtn" type="button" aria-label="打印或另存为 PDF" title="打印 / 存为 PDF">🖨️</button>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切换深浅色">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap layout" id="content">
+    <aside class="toc-side">
+      <nav class="toc" aria-label="本页目录"><p class="toc-title">本页目录</p><ol><li class="lvl-2"><a href="#download-panel">下载客户端</a></li><li class="lvl-2"><a href="#1-状态速查">1. 状态速查</a></li><li class="lvl-2"><a href="#2-安装-macos-软件">2. 安装 macOS 软件</a><ol><li class="lvl-3"><a href="#2-1-安装步骤">2.1 安装步骤</a></li><li class="lvl-3"><a href="#2-2-系统提示-无法验证开发者-怎么办">2.2 系统提示“无法验证开发者”怎么办</a></li></ol></li><li class="lvl-2"><a href="#3-开机-关机和模式切换">3. 开机、关机和模式切换</a><ol><li class="lvl-3"><a href="#开机与关机">开机与关机</a></li><li class="lvl-3"><a href="#切换连接方式">切换连接方式</a></li></ol></li><li class="lvl-2"><a href="#4-使用蓝牙连接">4. 使用蓝牙连接</a></li><li class="lvl-2"><a href="#5-使用-usb-串口连接">5. 使用 USB 串口连接</a></li><li class="lvl-2"><a href="#6-控制台使用">6. 控制台使用</a></li><li class="lvl-2"><a href="#7-连接-ai-工具">7. 连接 AI 工具</a><ol><li class="lvl-3"><a href="#设备状态灯效对照">设备状态灯效对照</a></li></ol></li><li class="lvl-2"><a href="#8-待机-休眠与自动关机">8. 待机、休眠与自动关机</a><ol><li class="lvl-3"><a href="#8-1-空闲时的呼吸灯">8.1 空闲时的呼吸灯</a></li><li class="lvl-3"><a href="#8-2-连续空闲自动熄灯-休眠">8.2 连续空闲自动熄灯（休眠）</a></li><li class="lvl-3"><a href="#8-3-蓝牙断连自动关机">8.3 蓝牙断连自动关机</a></li><li class="lvl-3"><a href="#8-4-充电与续航">8.4 充电与续航</a></li></ol></li><li class="lvl-2"><a href="#9-常见问题">9. 常见问题</a><ol><li class="lvl-3"><a href="#提示-需要安装-rosetta">提示“需要安装 Rosetta”</a></li><li class="lvl-3"><a href="#软件无法打开">软件无法打开</a></li><li class="lvl-3"><a href="#蓝牙模式一直红灯闪烁">蓝牙模式一直红灯闪烁</a></li><li class="lvl-3"><a href="#usb-模式一直黄灯闪烁">USB 模式一直黄灯闪烁</a></li><li class="lvl-3"><a href="#灯光没有变化">灯光没有变化</a></li><li class="lvl-3"><a href="#设备外壳上有灰尘或指纹-是别人用过的吗">设备外壳上有灰尘或指纹，是别人用过的吗？</a></li><li class="lvl-3"><a href="#空闲一会儿-灯自己灭了">空闲一会儿，灯自己灭了</a></li><li class="lvl-3"><a href="#设备自己关机了">设备自己关机了</a></li></ol></li><li class="lvl-2"><a href="#10-使用注意事项">10. 使用注意事项</a></li></ol></nav>
+    </aside>
+
+    <div>
+      <details class="toc-mobile">
+        <summary>本页目录</summary>
+        <nav class="toc" aria-label="本页目录"><p class="toc-title">本页目录</p><ol><li class="lvl-2"><a href="#download-panel">下载客户端</a></li><li class="lvl-2"><a href="#1-状态速查">1. 状态速查</a></li><li class="lvl-2"><a href="#2-安装-macos-软件">2. 安装 macOS 软件</a><ol><li class="lvl-3"><a href="#2-1-安装步骤">2.1 安装步骤</a></li><li class="lvl-3"><a href="#2-2-系统提示-无法验证开发者-怎么办">2.2 系统提示“无法验证开发者”怎么办</a></li></ol></li><li class="lvl-2"><a href="#3-开机-关机和模式切换">3. 开机、关机和模式切换</a><ol><li class="lvl-3"><a href="#开机与关机">开机与关机</a></li><li class="lvl-3"><a href="#切换连接方式">切换连接方式</a></li></ol></li><li class="lvl-2"><a href="#4-使用蓝牙连接">4. 使用蓝牙连接</a></li><li class="lvl-2"><a href="#5-使用-usb-串口连接">5. 使用 USB 串口连接</a></li><li class="lvl-2"><a href="#6-控制台使用">6. 控制台使用</a></li><li class="lvl-2"><a href="#7-连接-ai-工具">7. 连接 AI 工具</a><ol><li class="lvl-3"><a href="#设备状态灯效对照">设备状态灯效对照</a></li></ol></li><li class="lvl-2"><a href="#8-待机-休眠与自动关机">8. 待机、休眠与自动关机</a><ol><li class="lvl-3"><a href="#8-1-空闲时的呼吸灯">8.1 空闲时的呼吸灯</a></li><li class="lvl-3"><a href="#8-2-连续空闲自动熄灯-休眠">8.2 连续空闲自动熄灯（休眠）</a></li><li class="lvl-3"><a href="#8-3-蓝牙断连自动关机">8.3 蓝牙断连自动关机</a></li><li class="lvl-3"><a href="#8-4-充电与续航">8.4 充电与续航</a></li></ol></li><li class="lvl-2"><a href="#9-常见问题">9. 常见问题</a><ol><li class="lvl-3"><a href="#提示-需要安装-rosetta">提示“需要安装 Rosetta”</a></li><li class="lvl-3"><a href="#软件无法打开">软件无法打开</a></li><li class="lvl-3"><a href="#蓝牙模式一直红灯闪烁">蓝牙模式一直红灯闪烁</a></li><li class="lvl-3"><a href="#usb-模式一直黄灯闪烁">USB 模式一直黄灯闪烁</a></li><li class="lvl-3"><a href="#灯光没有变化">灯光没有变化</a></li><li class="lvl-3"><a href="#设备外壳上有灰尘或指纹-是别人用过的吗">设备外壳上有灰尘或指纹，是别人用过的吗？</a></li><li class="lvl-3"><a href="#空闲一会儿-灯自己灭了">空闲一会儿，灯自己灭了</a></li><li class="lvl-3"><a href="#设备自己关机了">设备自己关机了</a></li></ol></li><li class="lvl-2"><a href="#10-使用注意事项">10. 使用注意事项</a></li></ol></nav>
+      </details>
+      <article class="guide-content">
+<h1 id="agentcore-light-macos-客户使用手册">AgentCore-Light macOS 客户使用手册</h1>
+<section class="download-panel" id="download-panel" data-reveal><div class="download-panel-copy"><span class="download-panel-kicker">第一步 · 下载软件</span><h2>下载 macOS 客户端</h2><p>适用于所有 Mac（Intel 芯片和 Apple 芯片都可以）。下载后解压，把 <code>AgentCore-Light.app</code> 拖进「应用程序」文件夹。</p></div><div class="download-panel-actions"><div class="download-item"><a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light-mac.zip" download>下载 macOS 版 <span>↓</span></a><p class="download-version">当前版本 v2.1.2</p></div></div></section>
+<aside class="download-note" data-reveal><p class="download-note-title">第一次运行被系统拦住了？</p><p class="download-note-intro">App 没有加入 Apple 开发者计划、也没有做公证，macOS 提示“无法验证开发者”属于正常现象，<strong>不是病毒</strong>。</p><ul><li><strong>“无法验证开发者”或“Apple 无法检查是否包含恶意软件”</strong> → 系统设置 → 隐私与安全性 → 点“仍要打开”</li><li><strong>“已损坏，无法打开。你应该将它移到废纸篓。”</strong> → 打开“终端”执行：<br><code>xattr -dr com.apple.quarantine /Applications/AgentCore-Light.app</code></li><li><strong>双击没有反应</strong> → 确认已把 App 拖进“应用程序”文件夹，而不是在解压出来的文件夹里直接运行</li></ul><a class="download-note-more" href="#2-2-系统提示-无法验证开发者-怎么办">看详细说明 → 2.2 系统提示“无法验证开发者”怎么办</a></aside>
+<div class="meta" data-reveal><p>适用产品：AgentCore-Light 桌面状态指示灯</p><p>适用软件：AgentCore-Light macOS 客户端</p></div>
+<div class="callout callout-important" data-reveal><p><strong>磁铁片粘贴与售后提醒</strong></p><p>包装内附有磁铁片，方便将设备固定在合适的位置。请在收到商品后，先完成开机、连接、灯光、蜂鸣器等全部功能测试，再决定粘贴位置。<strong>磁铁片撕开背胶并粘贴后，不支持无理由退货。</strong>如发现商品异常，请勿粘贴，先联系售后处理。</p></div>
+<div class="callout callout-note" data-reveal><p><strong>包装内附有一片酒精棉片</strong></p><p>设备在出厂组装和测试时会接触工作台，外壳上可能留下少量灰尘或指纹，属于正常现象——用包装内附带的酒精棉片擦拭一遍即可擦净。<strong>每台设备出厂前都做过完整功能测试</strong>，灯效、蜂鸣器、按键均确认正常，功能没有问题，请放心使用。</p></div>
+<p>AgentCore-Light 通过三色灯和提示音展示电脑或 AI 工具的工作状态。Mac 用户可使用蓝牙无线连接，也可使用 USB 数据线有线连接。</p>
+<h2 id="1-状态速查"><a class="anchor" href="#1-状态速查" aria-label="本节链接">#</a>1. 状态速查</h2>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>指示状态</th><th>含义</th><th>您需要做什么</th></tr><tr><td><span class="chip chip-all">三色灯短暂亮起</span></td><td>设备正在开机</td><td>等待进入连接状态</td></tr><tr><td><span class="chip chip-red chip-blink">红灯闪烁</span></td><td>蓝牙模式，等待 Mac 连接</td><td>在 AgentCore-Light 中启动蓝牙模式</td></tr><tr><td><span class="chip chip-yellow chip-blink">黄灯闪烁</span></td><td>USB 串口模式，等待 Mac 软件连接</td><td>插入 USB 数据线，并在软件中启动 USB 串口模式</td></tr><tr><td><span class="chip chip-green chip-breathe">绿灯呼吸</span></td><td>当前连接方式已建立，设备处于空闲待命状态</td><td>可以开始使用软件或 AI 工具</td></tr><tr><td><span class="chip chip-off">所有状态灯熄灭</span></td><td>设备已关机</td><td>长按按键 3 秒开机</td></tr></tbody></table></div>
+<blockquote><p>「绿灯呼吸」指绿灯缓慢地一亮一暗，表示设备已连接、正在待命，不是闪烁也不是故障。</p></blockquote>
+<h2 id="2-安装-macos-软件"><a class="anchor" href="#2-安装-macos-软件" aria-label="本节链接">#</a>2. 安装 macOS 软件</h2>
+<h3 id="2-1-安装步骤"><a class="anchor" href="#2-1-安装步骤" aria-label="本节链接">#</a>2.1 安装步骤</h3>
+<p>安装包对 Intel 芯片和 Apple 芯片的 Mac 都适用，不用分辨芯片型号：</p>
+<ol>
+<li>解压下载到的 <code>AgentCore-Light-mac.zip</code>。</li>
+<li>将解压出来的 <code>AgentCore-Light.app</code> 拖入 <strong>Applications（应用程序）</strong> 文件夹。</li>
+<li>第一次运行时，在“应用程序”中按住 <strong>Control</strong> 键点按 <code>AgentCore-Light.app</code>，选择“打开”。</li>
+<li>软件启动后会自动打开浏览器控制台；若未自动打开，请在浏览器访问：<a href="http://127.0.0.1:18793/">http://127.0.0.1:18793/</a>。</li>
+</ol>
+<blockquote><p>请将 App 保留在“应用程序”文件夹中。这样登录自启动、AI 工具连接和在线更新都可以正常使用。</p></blockquote>
+<div class="callout callout-important" data-reveal><p>第一次打开时，macOS 很可能不允许运行，提示“无法验证开发者”或“已损坏，无法打开”。<strong>这是未签名软件的正常现象，不是 App 有问题</strong>，处理方法见下一节 <strong>2.2</strong>。</p></div>
+<div class="callout callout-note" data-reveal><p>Apple 芯片（M1 / M2 / M3 / M4）的 Mac 第一次打开时，系统可能提示安装 <strong>Rosetta</strong>，这是 macOS 的兼容运行机制：点“安装”，按提示完成即可，之后正常使用。</p></div>
+<h3 id="2-2-系统提示-无法验证开发者-怎么办"><a class="anchor" href="#2-2-系统提示-无法验证开发者-怎么办" aria-label="本节链接">#</a>2.2 系统提示“无法验证开发者”怎么办</h3>
+<p>AgentCore-Light 由一个独立开发者制作，<strong>没有加入 Apple 开发者计划，也没有做公证（Notarization）</strong>——这两项都需要每年付费。所以第一次打开时，macOS 通常会拦下来。<strong>这是缺少签名与公证导致的，不是 App 里有病毒。</strong></p>
+<p><strong>这个 App 实际上做什么：</strong></p>
+<ul>
+<li>只在本机运行。控制台网页只监听 <code>127.0.0.1</code>，也就是<strong>只有这台 Mac 打得开</strong>，同一个局域网里的其它设备也访问不到。</li>
+<li>除了检查软件更新，不向外部发送任何数据。</li>
+<li>开机自启动写在<strong>当前用户</strong>的登录项里，不需要管理员密码，也不会改动系统设置或其它软件。</li>
+</ul>
+<p><strong>按提示类型处理：</strong></p>
+<p><strong>① “无法打开，因为 Apple 无法检查其是否包含恶意软件”</strong></p>
+<p>这是 macOS 自带的 Gatekeeper 拦截。打开 <strong>系统设置 → 隐私与安全性</strong>，向下滚动找到“安全性”一栏，这里会列出刚才被拦下的 <code>AgentCore-Light</code>，点 <strong>“仍要打开”</strong>，再输入开机密码确认。</p>
+<p><strong>② “无法打开，因为无法验证开发者”</strong></p>
+<p>处理方法与上面完全相同：<strong>系统设置 → 隐私与安全性 → 仍要打开</strong>。</p>
+<div class="callout callout-tip" data-reveal><p>从 macOS 15（Sequoia）开始，Apple 已经取消了“按住 Control 点按”跳过检查的做法，只能从“隐私与安全性”里放行。所以第 3 步没成功时，直接走这里。</p></div>
+<p><strong>③ “AgentCore-Light 已损坏，无法打开。你应该将它移到废纸篓。”</strong></p>
+<p>这句话最容易让人误会成文件坏了或者带毒。实际上它通常是 macOS 给“从网上下载来的 App”打的隔离标记造成的，<strong>App 本身没有问题</strong>。去掉这个标记即可：</p>
+<ol>
+<li>打开 <strong>访达 → 应用程序 → 实用工具 → 终端</strong>。</li>
+<li>粘贴下面这行命令，按回车，然后输入开机密码：</li>
+</ol>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">bash</span><button class="copy-btn" type="button">复制</button></div><pre><code>xattr -dr com.apple.quarantine /Applications/AgentCore-Light.app</code></pre></div>
+<ol>
+<li>重新打开 <code>AgentCore-Light.app</code>，就可以正常启动了。</li>
+</ol>
+<div class="callout callout-note" data-reveal><p>如果 App 不在“应用程序”文件夹里，请把上面命令最后的路径换成实际位置。</p></div>
+<p><strong>运行之后还是不放心？</strong></p>
+<p>这个 App 没有请求麦克风、摄像头、通讯录、定位、屏幕录制等任何敏感权限。可以在 <strong>系统设置 → 隐私与安全性</strong> 里逐项查看确认。</p>
+<h2 id="3-开机-关机和模式切换"><a class="anchor" href="#3-开机-关机和模式切换" aria-label="本节链接">#</a>3. 开机、关机和模式切换</h2>
+<h3 id="开机与关机"><a class="anchor" href="#开机与关机" aria-label="本节链接">#</a>开机与关机</h3>
+<ul>
+<li><strong>开机：</strong>长按设备按键约 3 秒。达到时间后设备会立即显示开机灯效，并默认进入蓝牙模式。</li>
+<li><strong>关机：</strong>长按设备按键约 3 秒。达到时间后所有状态灯关闭，设备进入低功耗状态。</li>
+<li>插入 USB 只用于充电或 USB 通信，<strong>不会自动开机</strong>。</li>
+</ul>
+<h3 id="切换连接方式"><a class="anchor" href="#切换连接方式" aria-label="本节链接">#</a>切换连接方式</h3>
+<p>设备开机后默认蓝牙模式。短按一次设备按键即可切换：</p>
+<div class="code-block" data-reveal><div class="code-bar"><i></i><i></i><i></i><span class="code-lang">text</span><button class="copy-btn" type="button">复制</button></div><pre><code>蓝牙模式（红灯闪烁）
+        ⇅ 短按按键
+USB 串口模式（黄灯闪烁）</code></pre></div>
+<p>设备一次只启用一种连接方式，以降低功耗并避免连接冲突。</p>
+<h2 id="4-使用蓝牙连接"><a class="anchor" href="#4-使用蓝牙连接" aria-label="本节链接">#</a>4. 使用蓝牙连接</h2>
+<ol>
+<li>开机后确认设备红灯正在闪烁。</li>
+<li>在 Mac 的“系统设置”中确认蓝牙已打开。</li>
+<li>打开 <code>AgentCore-Light.app</code>，进入浏览器控制台。</li>
+<li>点击<strong>启动蓝牙模式</strong>。</li>
+<li>等待软件搜索并连接设备；设备绿灯呼吸即表示连接成功。</li>
+</ol>
+<blockquote><p>macOS 蓝牙由 AgentCore-Light 自动搜索和连接。通常无需在 macOS 蓝牙设备列表中手动添加设备；如软件未找到设备，请先确认设备处于红灯闪烁状态，再重新启动蓝牙模式。</p></blockquote>
+<h2 id="5-使用-usb-串口连接"><a class="anchor" href="#5-使用-usb-串口连接" aria-label="本节链接">#</a>5. 使用 USB 串口连接</h2>
+<ol>
+<li>确保设备已经开机。</li>
+<li>短按一次按键，确认黄灯闪烁。</li>
+<li>使用支持数据传输的 Type-C 数据线连接设备与 Mac。</li>
+<li>打开 AgentCore-Light 控制台，点击<strong>启动 USB 串口模式</strong>。</li>
+<li>等待软件连接成功；设备绿灯呼吸即表示可以使用。</li>
+</ol>
+<p>Mac 会自动识别设备，无需手动输入端口名称。如果软件提示没有找到设备，请更换支持数据传输的 Type-C 数据线后重试。</p>
+<h2 id="6-控制台使用"><a class="anchor" href="#6-控制台使用" aria-label="本节链接">#</a>6. 控制台使用</h2>
+<p>设备绿灯呼吸后，可以在控制台中：</p>
+<ul>
+<li>测试红、黄、绿灯的点亮与闪烁；</li>
+<li>调整整体灯光亮度（默认 30%）；</li>
+<li>开启、关闭或调节蜂鸣器音量；</li>
+<li>查看电量百分比、电池电压、USB 接入状态和最近更新时间；</li>
+<li>在“连接 AI 工具”中安装所需 AI 工具连接。</li>
+</ul>
+<p>亮度滑块松开后会立即生效，并保存在本机；下次启动软件或重新连接设备时会自动恢复。</p>
+<h2 id="7-连接-ai-工具"><a class="anchor" href="#7-连接-ai-工具" aria-label="本节链接">#</a>7. 连接 AI 工具</h2>
+<ol>
+<li>先完成蓝牙或 USB 连接，确认设备绿灯呼吸。</li>
+<li>在控制台打开<strong>连接 AI 工具</strong>。</li>
+<li>选择需要连接的 AI 工具，按页面提示完成安装。</li>
+<li>按提示重启对应 AI 工具或新建会话。</li>
+<li>AI 工作时，设备会自动显示工作中、完成、报错或等待确认等状态。</li>
+</ol>
+<h3 id="设备状态灯效对照"><a class="anchor" href="#设备状态灯效对照" aria-label="本节链接">#</a>设备状态灯效对照</h3>
+<p>AI 工具工作时，设备会自动按下面的方式显示当前状态：</p>
+<div class="table-wrap" data-reveal><table class="table-wide"><tbody><tr><th>状态</th><th>灯效</th><th>说明</th></tr><tr><td>空闲 IDLE</td><td><span class="chip chip-green chip-breathe">绿灯呼吸</span></td><td>没有任务在跑；连续空闲会自动熄灯休眠</td></tr><tr><td>工作 BUSY</td><td><span class="chip chip-yellow chip-blink">黄灯慢闪</span></td><td>正在调用工具或执行任务，约 1 秒闪一次</td></tr><tr><td>等待确认 WAIT_CONFIRM</td><td><span class="chip chip-yellow">黄灯常亮</span></td><td>需要你授权或确认</td></tr><tr><td>报错 ERROR</td><td><span class="chip chip-red chip-blink chip-blink-fast">红灯快闪</span></td><td>任务失败或出错</td></tr><tr><td>任务完成 SUCCESS</td><td><span class="chip chip-green chip-breathe">绿灯呼吸</span></td><td>任务成功时绿灯呼吸并响「上行提示」音，5 秒后回到空闲</td></tr></tbody></table></div>
+<blockquote><p>灯光亮度可在控制台调整（默认 30%）；蜂鸣器可以整体关闭，也可以单独调整音量。连续空闲 10 分钟会自动熄灯休眠，蓝牙断连 5 分钟自动关机，详见第 8 章。</p></blockquote>
+<h2 id="8-待机-休眠与自动关机"><a class="anchor" href="#8-待机-休眠与自动关机" aria-label="本节链接">#</a>8. 待机、休眠与自动关机</h2>
+<h3 id="8-1-空闲时的呼吸灯"><a class="anchor" href="#8-1-空闲时的呼吸灯" aria-label="本节链接">#</a>8.1 空闲时的呼吸灯</h3>
+<p>连接 AI 工具后，灯光会交给软件接管：没有任务在跑时，绿灯以<strong>低亮度呼吸</strong>显示，比正常工作亮度暗一些，也是省电设计。刚建立连接、软件还没接管灯光时，绿灯同样是呼吸显示——看到绿灯在缓慢地一亮一暗，就表示连接已经就绪。</p>
+<h3 id="8-2-连续空闲自动熄灯-休眠"><a class="anchor" href="#8-2-连续空闲自动熄灯-休眠" aria-label="本节链接">#</a>8.2 连续空闲自动熄灯（休眠）</h3>
+<p>连续空闲 <strong>10 分钟</strong>（默认）后，设备会熄灭全部状态灯、进入休眠，进一步省电。休眠期间连接保持不断；AI 工具有新任务时，灯会<strong>自动亮回来，不需要按任何按键</strong>。</p>
+<h3 id="8-3-蓝牙断连自动关机"><a class="anchor" href="#8-3-蓝牙断连自动关机" aria-label="本节链接">#</a>8.3 蓝牙断连自动关机</h3>
+<p>蓝牙模式下，如果连续 <strong>5 分钟</strong>没有连接（例如 Mac 关机、蓝牙关闭或软件退出），设备会<strong>自动关机</strong>；<strong>插着 USB 充电时同样会</strong>进入关机状态。需要使用时，长按按键约 3 秒重新开机。</p>
+<div class="callout callout-tip" data-reveal><p>上面两个时间都可以调整：空闲熄灯默认 10 分钟、断连关机默认 5 分钟，范围都是 0～3600 秒，设为 0 表示关闭对应的自动动作。开发者可通过 API 命令 <code>IDLE_SLEEP_SEC:</code>、<code>BT_DISCONNECT_OFF_SEC:</code> 修改（见 API 调用手册第 15 节）；普通用户如需修改，请联系售后。</p></div>
+<h3 id="8-4-充电与续航"><a class="anchor" href="#8-4-充电与续航" aria-label="本节链接">#</a>8.4 充电与续航</h3>
+<ul>
+<li>使用常规 USB 电源为设备充电。</li>
+<li>USB 接入且未充满时，充电指示灯亮；充满后完成指示灯亮。</li>
+<li>使用电池供电时，充电和完成指示灯均关闭，这是正常的节能设计。</li>
+<li>长时间不用时，请长按按键关机。</li>
+</ul>
+<h2 id="9-常见问题"><a class="anchor" href="#9-常见问题" aria-label="本节链接">#</a>9. 常见问题</h2>
+<h3 id="提示-需要安装-rosetta"><a class="anchor" href="#提示-需要安装-rosetta" aria-label="本节链接">#</a>提示“需要安装 Rosetta”</h3>
+<p>安装包对两种芯片的 Mac 都适用。Apple 芯片（M1 / M2 / M3 / M4）的 Mac 第一次打开时，系统会提示安装 <strong>Rosetta</strong>（macOS 的兼容运行机制），点“安装”并按提示完成即可，之后正常使用。若误点了“否”，重新双击 <code>AgentCore-Light.app</code> 会再次提示。</p>
+<h3 id="软件无法打开"><a class="anchor" href="#软件无法打开" aria-label="本节链接">#</a>软件无法打开</h3>
+<p>绝大多数情况是 macOS 的安全拦截，<strong>不是 App 有问题</strong>，详细步骤见 <strong>2.2 系统提示“无法验证开发者”怎么办</strong>。对照下面三种情况处理：</p>
+<ul>
+<li><strong>“无法验证开发者”或“Apple 无法检查其是否包含恶意软件”</strong> → 打开“系统设置 → 隐私与安全性”，在“安全性”一栏点“仍要打开”。</li>
+<li><strong>“已损坏，无法打开。你应该将它移到废纸篓。”</strong> → 在终端执行 <code>xattr -dr com.apple.quarantine /Applications/AgentCore-Light.app</code>，然后重新打开。</li>
+<li><strong>双击完全没有反应</strong> → 确认 App 已经拖进“应用程序”文件夹，而不是在解压出来的文件夹里直接运行。</li>
+</ul>
+<h3 id="蓝牙模式一直红灯闪烁"><a class="anchor" href="#蓝牙模式一直红灯闪烁" aria-label="本节链接">#</a>蓝牙模式一直红灯闪烁</h3>
+<ul>
+<li>确认 Mac 蓝牙已打开。</li>
+<li>确认控制台已点击“启动蓝牙模式”。</li>
+<li>关闭并重新打开蓝牙模式，或重启设备后重试。</li>
+</ul>
+<h3 id="usb-模式一直黄灯闪烁"><a class="anchor" href="#usb-模式一直黄灯闪烁" aria-label="本节链接">#</a>USB 模式一直黄灯闪烁</h3>
+<ul>
+<li>确认已短按按键切换到 USB 串口模式。</li>
+<li>确认使用的是数据线，而非仅充电线。</li>
+<li>重新插拔数据线后，在控制台再次启动 USB 串口模式。</li>
+</ul>
+<h3 id="灯光没有变化"><a class="anchor" href="#灯光没有变化" aria-label="本节链接">#</a>灯光没有变化</h3>
+<ul>
+<li>确认设备绿灯呼吸。</li>
+<li>在“灯光控制”中先测试任意颜色。</li>
+<li>确认亮度没有设为 0%。</li>
+</ul>
+<h3 id="设备外壳上有灰尘或指纹-是别人用过的吗"><a class="anchor" href="#设备外壳上有灰尘或指纹-是别人用过的吗" aria-label="本节链接">#</a>设备外壳上有灰尘或指纹，是别人用过的吗？</h3>
+<p>不是。每台设备出厂前都经过组装和完整功能测试（开机、灯效、蜂鸣器、按键），测试、装箱时会接触工作台，外壳上留下少量灰尘或指纹属于正常现象，不影响使用。用包装内附带的<strong>酒精棉片</strong>擦拭一遍即可擦净，功能没有问题。</p>
+<h3 id="空闲一会儿-灯自己灭了"><a class="anchor" href="#空闲一会儿-灯自己灭了" aria-label="本节链接">#</a>空闲一会儿，灯自己灭了</h3>
+<p>不是故障：连续空闲 10 分钟设备会自动熄灯休眠，连接并没有断开，AI 工具有新任务时会自动亮回来，不需要按任何按键。详见 <strong>8.2 连续空闲自动熄灯（休眠）</strong>。</p>
+<h3 id="设备自己关机了"><a class="anchor" href="#设备自己关机了" aria-label="本节链接">#</a>设备自己关机了</h3>
+<p>蓝牙模式下连续 5 分钟没有连接（电脑关机、蓝牙关闭或软件退出），设备会自动关机，插着 USB 充电时也一样。长按按键约 3 秒即可重新开机。详见 <strong>8.3 蓝牙断连自动关机</strong>。</p>
+<h2 id="10-使用注意事项"><a class="anchor" href="#10-使用注意事项" aria-label="本节链接">#</a>10. 使用注意事项</h2>
+<ul>
+<li>请勿自行拆开设备、短接接口或使用不匹配的电源。</li>
+<li>请避免在潮湿、高温或易燃环境中使用和充电。</li>
+<li>固件升级、维修或异常排查请联系售后，不建议客户自行操作。</li>
+</ul>
+      </article>
+    </div>
+  </main>
+
+  <button class="to-top" id="toTop" type="button" aria-label="返回顶部">↑</button>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>AgentCore-Light · 客户使用手册</span>
+      <span class="footer-shop">官方店铺：<a href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener">AgentCore-Light 淘宝店 ↗</a></span>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('printBtn').addEventListener('click', function () { window.print(); });
+  </script>
+  <script src="site.js" defer></script>
+</body>
+</html>

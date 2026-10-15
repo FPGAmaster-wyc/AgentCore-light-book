@@ -1,0 +1,631 @@
+<!doctype html>
+<!-- 这是首页 index.html 的英文副本。**首页是手写的、不由脚本生成，所以改中文版
+     首页时这一份必须跟着改**（发新版时尤其：两份各有三处版本号，见下面
+     download-version）。build_html.mjs 末尾有一段体检会在两份版本号不一致时告警。
+
+     语言跳转的规则写在 <head> 的内联脚本里，两份首页一致，唯一的差别是
+     pageLang 和目标网址。 -->
+<!-- data-lang 是构建时写死的「这一页是什么语言」，绝不从网址推导；
+     data-autolang 只出现在两个首页上 —— 四本手册页没有这个属性，
+     所以中文客户把 /en/windows.html 分享给别人时，对方不会被弹走。 -->
+<html lang="en" data-lang="en" data-autolang>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 这段要在页面画出来之前跑完，所以放在这里、不能挪到文件末尾，
+       而且必须排在 <title> 前面 —— 否则标签页标题会先闪一下再换掉：
+         0) 认出客户该看中文还是英文，该换语言就在首次绘制之前整页换掉
+         1) 套用上次选择的深浅色，避免刷新时闪白（和完整手册站共用同一个键，
+            两个站之间来回跳不会变来变去）
+         2) 认出客户在用哪个系统，写到 <html data-os> 上。晚一步的话，三个
+            系统的步骤会先一起闪出来再收起来
+         3) 标记「有脚本」，让需要 JS 的控件（系统切换胶囊）显示出来 -->
+  <script>
+    (function () {
+      var root = document.documentElement;
+
+      /* ---------- 0. 该看中文还是英文 ---------- */
+      var KEY_LANG = 'agentcore-lang';            // 客户点语言胶囊的选择，只在这里写
+      var KEY_BOUNCED = 'agentcore-lang-bounced'; // 本标签页已经自动换过一次语言了
+
+      function load(area, key) {
+        try { return area.getItem(key); } catch (error) { return null; }   // 隐私模式 / file:// 会抛
+      }
+      function save(area, key, value) {
+        try { area.setItem(key, value); return true; } catch (error) { return false; }
+      }
+
+      /* 中国时区白名单。不用 startsWith('Asia/')——那会把东京、首尔、
+         新加坡一起吸进来。港澳台也算中文：这里判的是客户读得懂哪种文字。 */
+      var CN_TIMEZONES = {
+        'Asia/Shanghai': 1, 'Asia/Chongqing': 1, 'Asia/Harbin': 1, 'PRC': 1,
+        'Asia/Urumqi': 1, 'Asia/Kashgar': 1,
+        'Asia/Hong_Kong': 1, 'Hongkong': 1, 'Asia/Macau': 1, 'Asia/Macao': 1,
+        'Asia/Taipei': 1, 'ROC': 1
+      };
+
+      function timezone() {
+        try {
+          var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          return typeof tz === 'string' ? tz : '';
+        } catch (error) { return ''; }
+      }
+      function inChina() { return CN_TIMEZONES[timezone()] === 1; }
+
+      /* 返回 'zh' / 'en' / ''（空串 = 认不出来）。认不出来就不猜、不换语言 ——
+         和首页认不出客户用什么系统时三个系统全列出来是同一个原则。 */
+      function detectLang() {
+        var langs = navigator.languages && navigator.languages.length
+          ? Array.prototype.slice.call(navigator.languages)
+          : [navigator.language || navigator.userLanguage || ''];
+        langs = langs.filter(Boolean).map(function (item) { return String(item).toLowerCase(); });
+
+        var i;
+        // 语言列表里主动列了中文。站点主语言就是中文，这是最强的单一信号
+        for (i = 0; i < langs.length; i++) {
+          if (langs[i] === 'zh' || langs[i].indexOf('zh-') === 0) return 'zh';
+        }
+        // ug-CN、bo-CN 这类语言的地区标在中国，同样按中文算
+        for (i = 0; i < langs.length; i++) {
+          if (/-(cn|hk|mo|tw)$/.test(langs[i])) return 'zh';
+        }
+
+        var hasEnglish = false;
+        for (i = 0; i < langs.length; i++) {
+          if (langs[i] === 'en' || langs[i].indexOf('en-') === 0) hasEnglish = true;
+        }
+        /* 只有英文、人在中国 —— 多半是系统装成英文的国内客户，给中文。
+           代价是在华外国人也会先看到中文，他们点一下「中文」就好。两边都是
+           一次点击，但「把误判留给读得懂两门语言的人」代价更小。 */
+        if (hasEnglish) return inChina() ? 'zh' : 'en';
+
+        // 明确是别的语言（日、韩、德…）—— 给英文，不看时区
+        if (langs.length) return 'en';
+
+        // 语言完全拿不到，只剩时区一个信号
+        var tz = timezone();
+        if (!tz) return '';
+        return inChina() ? 'zh' : 'en';
+      }
+
+      /* 从后退 / 前进回到这一页时不要再把人弹走，否则客户按后退会觉得「点了没用」 */
+      function cameFromHistory() {
+        try {
+          var entries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+          if (entries && entries.length) return entries[0].type === 'back_forward';
+          return !!(performance.navigation && performance.navigation.type === 2);
+        } catch (error) { return false; }
+      }
+
+      /* 该不该换语言，返回目标网址或空串。绝大多数请求在第一道判断就结束了。 */
+      function shouldBounce() {
+        var page = root.dataset.lang;
+        if (page !== 'zh' && page !== 'en') return '';
+        if (!root.hasAttribute('data-autolang')) return '';   // 手册页不掺和
+
+        var saved = load(localStorage, KEY_LANG);
+        var target = (saved === 'zh' || saved === 'en') ? saved : detectLang();
+        if (target !== 'zh' && target !== 'en') return '';
+        if (target === page) return '';
+
+        if (load(sessionStorage, KEY_BOUNCED) === '1') return '';   // 一个标签页只跳一次
+        if (cameFromHistory()) return '';
+
+        /* 英文首页只在客户明确选过中文时才回头。这一条让两个首页的判定不可能
+           互相矛盾，「你把我弹过去、我把你弹回来」从结构上就不会发生。 */
+        if (page === 'en' && saved !== 'zh') return '';
+        if (/bot|crawler|spider|slurp/i.test(navigator.userAgent || '')) return '';
+
+        /* 标记写不进去（Safari 无痕等）就干脆不跳：宁可让客户自己点一下，
+           也不冒来回弹的风险。自动跳转**绝不**写 localStorage —— 一次误判
+           会被永久记住；只有客户点语言胶囊才写。 */
+        if (!save(sessionStorage, KEY_BOUNCED, '1')) return '';
+        return page === 'zh' ? 'en/index.html' : '../index.html';
+      }
+
+      try {
+        var target = shouldBounce();
+        if (target) {
+          /* 带上 search 和 hash：首页的 id 两种语言是同一套，/#steps 跳过去仍然定位得上。
+             目标一律写显式文件名，不用 en/ —— file:// 下 en/ 会落成目录列表。 */
+          location.replace(target + location.search + location.hash);
+          return;   // 已经跳走了，剩下的初始化都不用做
+        }
+      } catch (error) {}
+
+      /* ---------- 1. 深浅色 ---------- */
+      try {
+        var theme = localStorage.getItem('agentcore-manual-theme');
+        if (theme === 'dark' || theme === 'light') root.dataset.theme = theme;
+      } catch (error) {}
+
+      /* ---------- 2. 客户在用哪个系统 ---------- */
+      try {
+        var saved = localStorage.getItem('agentcore-quick-os');
+        if (saved === 'windows' || saved === 'macos' || saved === 'linux') {
+          root.dataset.os = saved;
+        } else {
+          var os = '';
+          var ua = navigator.userAgent || '';
+          var touch = (navigator.maxTouchPoints || 0) > 1;
+
+          if (navigator.userAgentData && navigator.userAgentData.platform) {
+            var platform = String(navigator.userAgentData.platform).toLowerCase();
+            if (platform.indexOf('windows') > -1) os = 'windows';
+            else if (platform.indexOf('mac') > -1) os = 'macos';
+            else if (platform.indexOf('linux') > -1) os = 'linux';
+          } else if (/iPhone|iPad|iPod|Android/i.test(ua)) {
+            // 手机：客户多半是一边看手机一边装电脑，认不出是正常的
+            os = '';
+          } else if (/Macintosh/.test(ua) && touch) {
+            // iPadOS 的 UA 长得和 Mac 一模一样，有触摸点的就不是 Mac
+            os = '';
+          } else if (/Windows/i.test(ua)) {
+            os = 'windows';
+          } else if (/Mac OS X|Macintosh/i.test(ua)) {
+            os = 'macos';
+          } else if (/Linux|X11|CrOS/i.test(ua)) {
+            os = 'linux';
+          }
+
+          /* 认不出来就什么都不写 —— quick.css 里没有 data-os 时三个系统
+             的步骤会全部列出来，客户自己点胶囊选，不会看到错的那一套。 */
+          if (os) root.dataset.os = os;
+        }
+      } catch (error) {}
+
+      root.dataset.js = 'on';
+    })();
+  </script>
+  <title>AgentCore-Light Quick Start · up and running in 3 minutes</title>
+  <meta name="description" content="Quick start guide for the AgentCore-Light AI status light: power on, install the app, connect to your computer, test the lights — four steps and you are set.">
+  <meta name="theme-color" content="#f3f6f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1517" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="canonical" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/index.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/index.html">
+  <link rel="alternate" hreflang="en" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/en/index.html">
+  <link rel="alternate" hreflang="x-default" href="https://fpgamaster-wyc.github.io/AgentCore-light-book/index.html">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../quick.css">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a class="brand" href="index.html">
+        <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>AgentCore-Light<small>Quick start</small></span>
+      </a>
+      <div class="header-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <nav class="header-nav" aria-label="Page navigation">
+        <a class="tab" href="api.html">API Manual</a>
+        <a class="tab tab-shop" href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener" title="Official store · Support and accessories">Official store</a>
+        <a class="tab tab-lang" href="../index.html" hreflang="zh-CN" lang="zh" title="切换到中文" data-lang="zh">中文</a>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch light / dark theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap home" id="content">
+
+    <section class="hero">
+      <p class="hero-label">Out-of-the-box setup</p>
+      <h1>Up and running in 3 minutes</h1>
+      <p class="hero-sub">Work through the four steps below and the device will start lighting up with your AI tools. If you get stuck, see “Stuck?” at the end.</p>
+    </section>
+
+    <!-- ================= 开箱提醒 =================
+         刻意放在下载和四步之前：这两条对应的正是最容易产生退款纠纷的两种情况 ——
+         还没测就贴了磁铁片、看到出厂测试留下的灰尘以为是二手。
+
+         ⚠️ 改这一块时记得同步 en/ 那边。 -->
+    <section class="notice" data-reveal>
+      <p class="notice-title">Before you start, please read these two</p>
+      <div class="notice-grid">
+        <div class="notice-item">
+          <h2>Do not attach the magnetic plate yet</h2>
+          <p>Please finish the four steps below and confirm the lights and buzzer all work before you decide where to mount it. <strong>Once the backing is peeled off the magnetic plate and it is attached, the item can no longer be returned under our no-questions-asked policy.</strong> If anything seems wrong with the device, do not attach it — contact us first.</p>
+        </div>
+        <div class="notice-item">
+          <h2>Dust or fingerprints on the shell are normal</h2>
+          <p>Every unit is fully function-tested before it leaves the factory, and it is handled on the workbench during assembly and testing. <strong>One wipe with the alcohol pad included in the box clears it</strong> — there is nothing wrong with your unit.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 下载 =================
+         安装包就在站点根目录的 https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/ 下（这一页在 en/ 里，所以路径带 ../），
+         由 package_downloads.py 从 dist/ 打出来。
+
+         ⚠️ 版本号是手写的（四本手册是脚本从源码读的）。发新版时在下面三处
+            download-version 里改，**中文首页那三处也要一起改**。 -->
+    <section class="detect" id="download" data-reveal>
+      <div class="detect-main">
+        <p class="detect-kicker" id="detectKicker">Confirm your computer system</p>
+        <h2 class="detect-title">Download and install the app</h2>
+        <p class="detect-note os-only" data-for="windows">Unzip and double-click <code>AgentCore-Light.exe</code> to run it. No drivers to install, no internet needed.</p>
+        <p class="detect-note os-only" data-for="macos">Unzip and drag <code>AgentCore-Light.app</code> into your Applications folder.</p>
+        <p class="detect-note os-only" data-for="linux">Unzip, then give it execute permission in a terminal and run it. No Python required.</p>
+
+        <div class="os-switch" data-js-only>
+          <p class="os-switch-label">Not your system? Pick it yourself:</p>
+          <button class="os-pill" type="button" data-os="windows" aria-pressed="false">Windows</button>
+          <button class="os-pill" type="button" data-os="macos" aria-pressed="false">macOS</button>
+          <button class="os-pill" type="button" data-os="linux" aria-pressed="false">Linux</button>
+        </div>
+      </div>
+      <div class="detect-actions">
+        <div class="download-item os-only" data-for="windows">
+          <a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light.zip" download>Download for Windows <span>↓</span></a>
+          <p class="download-version">Current version v2.1.2 · Windows 10 / 11</p>
+        </div>
+        <div class="download-item os-only" data-for="macos">
+          <a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light-mac.zip" download>Download for macOS <span>↓</span></a>
+          <p class="download-version">Current version v2.1.2 · Intel and Apple silicon</p>
+        </div>
+        <div class="download-item os-only" data-for="linux">
+          <a class="download-btn" href="https://github.com/FPGAmaster-wyc/AgentCore-light-book/releases/latest/download/AgentCore-Light-linux.tar.gz" download>Download for Linux <span>↓</span></a>
+          <p class="download-version">Current version v2.1.2 · x86_64</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 四步 ================= -->
+    <h2 class="section-title" id="steps">Four steps to set up</h2>
+    <p class="section-sub">Steps 1 and 4 are the same everywhere; steps 2 and 3 follow the system you are using.</p>
+
+    <ol class="steps">
+      <li class="step" data-reveal>
+        <div class="step-num" aria-hidden="true">1</div>
+        <div class="step-body">
+          <h3>Press and hold to power on <span class="step-tag">Same on every system</span></h3>
+          <p>Press and hold the button on the device for about <strong>3 seconds</strong>, then let go. The three lights flash briefly and then settle on <strong>red blinking</strong> — the device is on and waiting to connect.</p>
+          <p>Plugging in the USB cable does not power it on; you still press and hold. Press and hold for 3 seconds to power off as well.</p>
+        </div>
+      </li>
+
+      <li class="step" data-reveal>
+        <div class="step-num" aria-hidden="true">2</div>
+        <div class="step-body">
+          <h3>Install the app <span class="step-tag">Follows your system</span></h3>
+
+          <div class="os-only" data-for="windows">
+            <ol>
+              <li>Download <code>AgentCore-Light.zip</code> above and unzip it to get <code>AgentCore-Light.exe</code>.</li>
+              <li>Double-click <code>AgentCore-Light.exe</code> to run it. The app opens a browser page — that is the console.</li>
+            </ol>
+            <div class="callout callout-important">
+              <p><strong>Windows says “Windows protected your PC” — what now?</strong></p>
+              <p>Click “More info” → “Run anyway”. The app has no paid code-signing certificate and new releases have few downloads, so SmartScreen blocking it is normal — <strong>it is not a virus</strong>. If your antivirus warns or quarantines the file, add it to the trusted list.</p>
+            </div>
+          </div>
+
+          <div class="os-only" data-for="macos">
+            <ol>
+              <li>Download <code>AgentCore-Light-mac.zip</code> above and unzip it to get <code>AgentCore-Light.app</code>.</li>
+              <li><strong>Drag <code>AgentCore-Light.app</code> into your Applications folder.</strong> Do not skip this — running it straight from the unzipped folder breaks start-at-sign-in, AI tool connections and online updates later on.</li>
+              <li>Find it in Applications, <strong>Control-click</strong> (or right-click) the icon, choose “Open”, and confirm once more.</li>
+            </ol>
+            <div class="callout callout-important">
+              <p><strong>Mac says it “cannot verify the developer” — what now?</strong></p>
+              <p>Open <strong>System Settings → Privacy &amp; Security</strong>, find the message that blocked it, and click <strong>Open Anyway</strong>. From macOS 15 on, Control-click no longer works — this is the only way.</p>
+              <p>If it says <strong>“is damaged and can’t be opened”</strong>, open Terminal, run the line below, and try opening it again:</p>
+              <p class="step-command">xattr -dr com.apple.quarantine /Applications/AgentCore-Light.app</p>
+              <p>If <strong>double-clicking does nothing at all</strong>, the app is usually not in your Applications folder — go back to step 2 above.</p>
+            </div>
+          </div>
+
+          <div class="os-only" data-for="linux">
+            <ol>
+              <li>Download <code>AgentCore-Light-linux.tar.gz</code> above and unzip it.</li>
+              <li>Open a terminal and change into the unzipped folder.</li>
+              <li>The first run needs execute permission; then start it:</li>
+            </ol>
+            <p class="step-command">chmod +x AgentCore-Light
+./AgentCore-Light</p>
+            <div class="callout callout-warning">
+              <p><strong>Do not start it with <code>sudo ./AgentCore-Light</code>.</strong></p>
+              <p>The app runs as an ordinary user throughout — it neither needs nor should have elevated rights. Only the serial-permission command in step 3 below needs sudo.</p>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <li class="step" data-reveal>
+        <div class="step-num" aria-hidden="true">3</div>
+        <div class="step-body">
+          <h3>Connect to your computer <span class="step-tag">Follows your system</span></h3>
+          <p>After powering on, the device goes into <strong>Bluetooth mode</strong> by itself, with the status light <strong>red blinking</strong> to show it is waiting for the computer. Once connected, red turns into <strong>green breathing</strong> (the light slowly fading up and down).</p>
+          <p>Pick <strong>either</strong> of the two connection methods below: Bluetooth needs no cable and suits everyday use; USB is more stable when Bluetooth is inconvenient.</p>
+
+          <div class="ways">
+            <div class="way">
+              <p class="way-head">Bluetooth <span class="way-badge">Recommended</span></p>
+
+              <ol class="os-only" data-for="windows">
+                <li>Open <strong>Settings → Bluetooth &amp; devices → Add device → Bluetooth</strong>, wait for <strong>AgentCore-Light</strong> to appear in the list and select it.</li>
+                <li>Open its <strong>device details page and click “Connect” once more</strong>. Pairing alone is not enough — this step is required.</li>
+                <li>Go back to the app and click <strong>Start Bluetooth mode</strong>.</li>
+              </ol>
+              <p class="os-only" data-for="windows"><small>Windows may show it as an <strong>audio device</strong>, under a different name — that is so Windows manages the connection reliably. It will not play your computer’s sound.</small></p>
+
+              <ol class="os-only" data-for="macos">
+                <li>Click <strong>Start Bluetooth mode</strong> in the app; it searches and connects by itself.</li>
+                <li>No need to add anything by hand in the system Bluetooth settings.</li>
+              </ol>
+
+              <ol class="os-only" data-for="linux">
+                <li>Click <strong>Start Bluetooth mode</strong> in the app; it searches and connects by itself.</li>
+                <li>No need to add anything by hand in the system Bluetooth settings. If your computer has no Bluetooth, use the USB method on the right.</li>
+              </ol>
+            </div>
+
+            <div class="way">
+              <p class="way-head">USB cable <span class="way-badge way-badge-plain">When Bluetooth is awkward</span></p>
+              <ol>
+                <li><strong>Short-press the button once</strong> on the device to switch to USB serial mode (yellow blinking).</li>
+                <li>Connect it to the computer with a <strong>Type-C cable that carries data</strong>. Some cables only charge and the device will not be recognised — try another one.</li>
+                <li>Click <strong>Start USB mode</strong> in the app.</li>
+              </ol>
+              <div class="os-only" data-for="linux">
+                <p>The first time you use USB, grant your account serial port permission, then <strong>log out and back in</strong> (just closing the terminal window is not enough):</p>
+                <p class="step-command">sudo usermod -aG dialout $USER</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout callout-tip">
+            <p><strong>Connected looks like this: green breathing on the device (slowly fading up and down) and the app showing the device as connected.</strong> The two connections cannot be on at once; short-press the button to switch.</p>
+          </div>
+        </div>
+      </li>
+
+      <li class="step" data-reveal>
+        <div class="step-num" aria-hidden="true">4</div>
+        <div class="step-body">
+          <h3>Test the lights and buzzer <span class="step-tag">Same on every system</span></h3>
+          <ol>
+            <li>When the app starts it opens a browser page — that is the console. If it does not open by itself, go to <code>http://127.0.0.1:18793/</code>.</li>
+            <li>Under <strong>Light control</strong>, click the red, yellow and green lights in turn and confirm the device lights up with each one.</li>
+            <li>Click the buzzer and confirm you hear a tone.</li>
+          </ol>
+          <p>Once the lights and the buzzer both work, the device is working correctly and you can start using it.</p>
+          <div class="callout callout-tip">
+            <p><strong>All three work — now you can attach the magnetic plate.</strong> If any of them does not, do not attach it yet; contact us first. Once the backing is peeled off the magnetic plate and it is attached, the item can no longer be returned under our no-questions-asked policy.</p>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <!-- ================= 摆放 ================= -->
+    <h2 class="section-title" id="mount">Two ways to mount it</h2>
+    <p class="section-sub">Once all four steps check out, decide where the device should live. It can hang on the side of your monitor or stand on the desk — a magnetic plate is included in the box.</p>
+    <div class="mount-cards">
+      <article class="mount-card" data-reveal>
+        <div class="mount-figure">
+          <svg class="mount-art" viewBox="0 0 240 150" aria-hidden="true">
+            <rect class="frame" x="26" y="16" width="116" height="86" rx="7"/>
+            <rect class="screen" x="34" y="24" width="100" height="70" rx="4"/>
+            <rect class="frame" x="78" y="102" width="12" height="18"/>
+            <rect class="frame" x="58" y="120" width="52" height="7" rx="3.5"/>
+            <rect class="plate" x="142" y="40" width="6" height="60" rx="3"/>
+            <circle class="loop" cx="170" cy="13" r="6"/>
+            <rect class="dev" x="148" y="20" width="44" height="100" rx="9"/>
+            <circle class="lamp-r" cx="170" cy="46" r="13"/>
+            <circle class="lamp-y" cx="170" cy="72" r="13"/>
+            <circle class="lamp-g" cx="170" cy="98" r="13"/>
+          </svg>
+        </div>
+        <h3>Side mount · hang it on your monitor</h3>
+        <p>Stick the magnetic plate to the side of your monitor and the device snaps onto it, hanging at the edge of the screen. It takes up no desk space, and one glance up tells you the current status.</p>
+      </article>
+      <article class="mount-card" data-reveal>
+        <div class="mount-figure">
+          <svg class="mount-art" viewBox="0 0 240 150" aria-hidden="true">
+            <rect class="frame" x="18" y="122" width="204" height="9" rx="4.5"/>
+            <rect class="plate" x="96" y="116" width="48" height="6" rx="3"/>
+            <circle class="loop" cx="120" cy="9" r="6"/>
+            <rect class="dev" x="98" y="16" width="44" height="100" rx="9"/>
+            <circle class="lamp-r" cx="120" cy="42" r="13"/>
+            <circle class="lamp-y" cx="120" cy="68" r="13"/>
+            <circle class="lamp-g" cx="120" cy="94" r="13"/>
+          </svg>
+        </div>
+        <h3>Base mount · stand it on the desk</h3>
+        <p>Stick the magnetic plate to the desk and the device snaps down onto it, standing upright. You can place it wherever suits you, and it is harder to knock over.</p>
+      </article>
+    </div>
+    <ol class="mount-steps" data-reveal>
+      <li><strong>Confirm the device works:</strong> if you have not finished the light and buzzer test in step 4, do that first.</li>
+      <li><strong>Wipe the device clean:</strong> if the shell has dust or fingerprints, wipe it once with the alcohol pad in the box.</li>
+      <li><strong>Attach the magnetic plate:</strong> peel off the backing and press it firmly where you chose — the side of the monitor or the desk.</li>
+      <li><strong>Snap the device on:</strong> bring the device onto the plate and give it a light push to confirm it holds.</li>
+    </ol>
+
+    <!-- ================= 灯效速查 ================= -->
+    <h2 class="section-title" id="lamps">What the status lights mean</h2>
+    <p class="section-sub">Worth coming back to from time to time. The red, yellow and green lights always mean the same things.</p>
+
+    <h3 class="section-title section-title-sub">Before any AI tool is connected</h3>
+    <div class="lamp-list" data-reveal>
+      <div class="lamp-row">
+        <span class="chip chip-all">All LEDs flash</span>
+        <p class="lamp-mean">Powering on — one moment.</p>
+      </div>
+      <div class="lamp-row">
+        <span class="chip chip-red chip-blink">Red blinking</span>
+        <p class="lamp-mean">Bluetooth mode, waiting for the computer to connect.</p>
+      </div>
+      <div class="lamp-row">
+        <span class="chip chip-yellow chip-blink">Yellow blinking</span>
+        <p class="lamp-mean">USB serial mode, waiting for the app to connect.</p>
+      </div>
+      <div class="lamp-row">
+        <span class="chip chip-green chip-breathe">Green breathing</span>
+        <p class="lamp-mean">Connected and idle. <strong>Green fading slowly up and down means the connection is good.</strong></p>
+      </div>
+      <div class="lamp-row">
+        <span class="chip chip-off">All LEDs off</span>
+        <p class="lamp-mean">Powered off. Press and hold the button for 3 seconds to power on again.</p>
+      </div>
+    </div>
+
+    <h3 class="section-title section-title-sub">Once your AI tools take over</h3>
+    <div class="ai-states ai-states-quiet">
+      <article class="ai-state" data-state="idle" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>Idle IDLE</h3>
+        <p>Nothing is running — <strong>green breathing at low brightness</strong>. After 10 minutes continuously idle it goes dark to sleep, and lights up again by itself when new work arrives.</p>
+      </article>
+      <article class="ai-state" data-state="busy" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>Working BUSY</h3>
+        <p>A task is running — <strong>yellow slow blink</strong> (about once a second).</p>
+      </article>
+      <article class="ai-state" data-state="wait" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>Waiting WAIT_CONFIRM</h3>
+        <p>The AI needs you to authorise or confirm something — <strong>yellow steady</strong>.</p>
+      </article>
+      <article class="ai-state" data-state="error" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>Error ERROR</h3>
+        <p>The task failed or hit an error — <strong>red fast blink</strong>.</p>
+      </article>
+      <article class="ai-state" data-state="success" data-reveal>
+        <div class="ai-lamps" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <h3>Done SUCCESS</h3>
+        <p>The task succeeded — <strong>green breathing</strong> plus one “rising” tone, then back to idle after 5 seconds. <strong>The tone is what confirms the task is done.</strong></p>
+        <span class="ai-beep">Rising tone</span>
+      </article>
+    </div>
+
+    <!-- ================= 按键 ================= -->
+    <h2 class="section-title" id="keys">One button, three ways to press it</h2>
+    <p class="section-sub">The body has a single button; a short press and a long press do different things.</p>
+    <div class="keys">
+      <article class="key-card" data-reveal>
+        <div class="key-figure">
+          <span class="key-cap key-tap" aria-hidden="true"></span>
+          <strong>Short press</strong>
+        </div>
+        <p>Switches between <strong>Bluetooth mode</strong> (red blinking) and <strong>USB mode</strong> (yellow blinking). Only one connection can be on at a time — a short press switches it.</p>
+      </article>
+      <article class="key-card" data-reveal>
+        <div class="key-figure">
+          <span class="key-cap key-hold" aria-hidden="true"></span>
+          <strong>Hold 3 seconds</strong>
+        </div>
+        <p><strong>Power on</strong> and <strong>power off</strong> are both a 3-second hold. Powered off, every status light goes out and it uses the least battery; plugging in USB will not power it on either — you still hold the button.</p>
+      </article>
+      <article class="key-card" data-reveal>
+        <div class="key-figure">
+          <span class="key-cap" aria-hidden="true">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
+              <rect x="2.6" y="8" width="18.8" height="8" rx="4" stroke="currentColor" stroke-width="1.7"/>
+              <rect x="7.6" y="10.8" width="8.8" height="2.4" rx="1.2" fill="currentColor"/>
+            </svg>
+          </span>
+          <strong>Type-C charging</strong>
+        </div>
+        <p>Charge over Type-C, and you can use it while it charges. Battery level, voltage and whether it is charging are all visible in the console.</p>
+      </article>
+    </div>
+
+    <!-- ================= 卡住了 ================= -->
+    <h2 class="section-title" id="fixes">Stuck?</h2>
+    <p class="section-sub">These cover almost everything. Click one to open it.</p>
+    <div class="fixes">
+      <details class="fix" data-reveal>
+        <summary>It keeps blinking red and will not connect</summary>
+        <div class="fix-body">
+          <p>Red blinking means the device is fine and waiting for the computer. The problem is usually on the computer side:</p>
+          <ol>
+            <li><strong>Windows: clicking “Start Bluetooth mode” in the app is not enough.</strong> Pair it first under <strong>Settings → Bluetooth &amp; devices</strong>, then open the device details page and click “Connect” once, and only then start Bluetooth mode in the app.</li>
+            <li>Check that the device is not already connected to another computer or phone — Bluetooth connects to only one device at a time.</li>
+            <li>If it still will not connect, switch to USB: short-press the button once for yellow blinking, plug in a data cable, and click <strong>Start USB mode</strong> in the app.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>It keeps blinking yellow and will not connect</summary>
+        <div class="fix-body">
+          <p>Yellow blinking means the device has switched to USB mode and is waiting for the app. Check each of these:</p>
+          <ul>
+            <li>Have you clicked <strong>Start USB mode</strong> in the app?</li>
+            <li>Is the cable a <strong>charge-only</strong> one? Swap in a Type-C cable that carries data.</li>
+            <li>Is the device really in USB mode? <strong>A short press of the button</strong> switches between the two modes.</li>
+            <li>Linux: have you granted serial port permission? It only takes effect after you <strong>log out and back in</strong> — closing the terminal window is not enough.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>The app says it is connected but the light does not change</summary>
+        <div class="fix-body">
+          <ul>
+            <li>First <strong>click the red light by hand</strong> under <strong>Light control</strong> in the console. If it lights up normally, the connection is fine.</li>
+            <li>Check that <strong>brightness has not been set to 0%</strong>.</li>
+            <li>Once your AI tools take over, the light follows the AI’s state. Idle is <strong>green breathing at low brightness</strong> — dim is normal.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>The light goes out by itself after a while</summary>
+        <div class="fix-body">
+          <p><strong>That is normal, not a fault.</strong> Once your AI tools take over, 10 minutes continuously idle (the default) turns all status lights off and puts the device to sleep to save battery. The connection is not dropped — the light comes back by itself when the AI has new work, with no button press needed.</p>
+          <p>To change the time or turn the feature off, see chapter 8 of the full manual.</p>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>The device powered itself off</summary>
+        <div class="fix-body">
+          <p><strong>Also normal.</strong> In Bluetooth mode, 5 minutes with no connection (computer shut down, Bluetooth off, or the app quit) makes the device power itself off to save battery — <strong>even while USB charging is plugged in</strong>.</p>
+          <p>Press and hold the button for 3 seconds to power on again. That time can be changed or turned off too; see the full manual.</p>
+        </div>
+      </details>
+
+      <details class="fix" data-reveal>
+        <summary>Windows or my antivirus says this software is a virus</summary>
+        <div class="fix-body">
+          <p>The app is made by an independent developer and <strong>has no paid code-signing certificate</strong>, so Windows SmartScreen, macOS Gatekeeper or your antivirus may block it the first time — <strong>that is the missing signature, not a virus inside the software</strong>.</p>
+          <p>Each system’s prompts and how to get past them have their own section at the start of the full manual; just follow the steps.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ================= 通向完整手册 ================= -->
+    <section class="more-box" data-reveal>
+      <div>
+        <h2>Need more?</h2>
+        <p>The four steps above are enough to get going. To adjust brightness, sleep and auto power-off times, or start-at-sign-in, or to drive the device from your own code, see the full manuals.</p>
+      </div>
+      <div class="more-links">
+        <a class="more-link" href="windows.html">Windows manual</a>
+        <a class="more-link" href="macos.html">macOS manual</a>
+        <a class="more-link" href="linux.html">Linux manual</a>
+        <a class="more-link" href="api.html">API manual</a>
+      </div>
+    </section>
+
+  </main>
+
+  <button class="to-top" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>AgentCore-Light · Quick start</span>
+      <span class="footer-shop">Official store: <a href="https://shop426753734.taobao.com/?spm=a21xtw.29978516.0.0" target="_blank" rel="noopener">AgentCore-Light on Taobao ↗</a></span>
+    </div>
+  </footer>
+
+  <script src="../site.js" defer></script>
+  <script src="../quick.js" defer></script>
+</body>
+</html>
